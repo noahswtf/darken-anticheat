@@ -32,7 +32,6 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 
 			call_info->response = communication::e_response::clean;
-			*reinterpret_cast<communication::s_call_info**>(irp->AssociatedIrp.SystemBuffer) = call_info;
 
 	#ifdef _DEBUG
 			DbgPrint("[darken-ac]: running IO_CODE_TEMPLATE respective call.");
@@ -45,8 +44,6 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 
 			detections::process::find_suspicious_modules(call_info);
-
-			*reinterpret_cast<communication::s_call_info**>(irp->AssociatedIrp.SystemBuffer) = call_info;
 
 #ifdef _DEBUG
 			DbgPrint("[darken-ac]: running IO_CODE_TEMPLATE respective call.");
