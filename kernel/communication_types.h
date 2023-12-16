@@ -1,6 +1,6 @@
 #pragma once
 
-namespace driver
+namespace communication
 {
 	enum class e_response : unsigned long long
 	{
@@ -16,13 +16,13 @@ namespace driver
 
 	enum class e_call_code : unsigned long
 	{
-		test = 0x1500,
-		check_suspicious_modules = 0x1501
+		test = 0x1500
 	};
 
-	struct s_suspicious_modules_check
+	struct s_blacklisted_modules_check
 	{
-		unsigned long long target_process_id;
+		unsigned long long target_process_id = 0ull;
+		wchar_t* whitelisted_modules[4];
 	};
 
 	struct s_call_info
@@ -33,13 +33,7 @@ namespace driver
 
 		union
 		{
-			s_suspicious_modules_check suspicious_modules_check;
+			s_blacklisted_modules_check blacklisted_modules_check;
 		};
 	};
-
-	s_call_info send_call(s_call_info call_info);
-
-	void initialise(), clean_up();
-
-	inline void* handle = nullptr;
 }

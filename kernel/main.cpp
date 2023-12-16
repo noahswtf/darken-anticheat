@@ -1,8 +1,9 @@
 #include <ntifs.h>
-#include <ntddk.h>
+#include "detections.h"
 
 #define CTL_CODE_T(code) CTL_CODE(FILE_DEVICE_UNKNOWN, code, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
 #define IO_CODE_TEST CTL_CODE_T(0x1500)
+#define IO_CODE_CHECK_SUSPICIOUS_MODULES CTL_CODE_T(0x1501)
 
 UNICODE_STRING device_name = RTL_CONSTANT_STRING(L"\\Device\\darken-ac"),
 	device_symbolic_name = RTL_CONSTANT_STRING(L"\\DosDevices\\darken-ac");
@@ -18,19 +19,6 @@ NTSTATUS ioctl_manage_call(PDEVICE_OBJECT device_object, PIRP irp)
 	return STATUS_SUCCESS;
 }
 
-enum class e_response : unsigned long long
-{
-	flagged,
-	clean
-};
-
-struct s_call_info
-{
-	unsigned long control_code = 0ul;
-
-	e_response response = e_response::flagged;
-};
-
 NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 {
 	UNREFERENCED_PARAMETER(device_object);
@@ -39,33 +27,46 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 	switch (code)
 	{
-	case IO_CODE_TEST:
-	{
-		s_call_info* call_info = reinterpret_cast<s_call_info*>(irp->AssociatedIrp.SystemBuffer);
+		case IO_CODE_TEST:
+		{
+			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 
-		call_info->response = e_response::clean;
+			call_info->response = communication::e_response::clean;
+			*reinterpret_cast<communication::s_call_info**>(irp->AssociatedIrp.SystemBuffer) = call_info;
 
-		*reinterpret_cast<s_call_info**>(irp->AssociatedIrp.SystemBuffer) = call_info;
+	#ifdef _DEBUG
+			DbgPrint("[darken-ac]: running IO_CODE_TEMPLATE respective call.");
+	#endif
+
+			break;
+		}
+		case IO_CODE_CHECK_SUSPICIOUS_MODULES:
+		{
+			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
+
+			detections::process::find_suspicious_modules(call_info);
+
+			*reinterpret_cast<communication::s_call_info**>(irp->AssociatedIrp.SystemBuffer) = call_info;
 
 #ifdef _DEBUG
-		DbgPrint("[darken-ac]: running IO_CODE_TEMPLATE respective call.");
+			DbgPrint("[darken-ac]: running IO_CODE_TEMPLATE respective call.");
 #endif
 
-		break;
-	}
-	default:
-	{
-		// so we know if the codes are correct etc
-#ifdef _DEBUG
-		DbgPrint("[darken-ac]: ioctl code is invalid.");
-#endif
+			break;
+		}
+		default:
+		{
+			// so we know if the codes are correct etc
+	#ifdef _DEBUG
+			DbgPrint("[darken-ac]: ioctl code is invalid.");
+	#endif
 
-		break;
-	}
+			break;
+		}
 	}
 
 	irp->IoStatus.Status = STATUS_SUCCESS;
-	irp->IoStatus.Information = sizeof(s_call_info);
+	irp->IoStatus.Information = sizeof(communication::s_call_info);
 
 	IoCompleteRequest(irp, IO_NO_INCREMENT);
 
@@ -93,7 +94,7 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 #ifdef DEBUG
 		DbgPrint("[darken-ac]: unable to create io device.");
 #endif
-
+		
 		return sanity_status;
 	}
 
