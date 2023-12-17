@@ -154,3 +154,8 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 
 	return e_error::success;
 }
+
+e_error detections::system::find_suspicious_threads(communication::s_call_info*& call_info)
+{
+
+}
