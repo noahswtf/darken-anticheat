@@ -24,12 +24,18 @@
     <ClCompile Include="src\utilities\utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\protected_process\process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\driver\driver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\protected_process\process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

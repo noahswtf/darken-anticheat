@@ -1,4 +1,5 @@
 #include "driver/driver.h"
+#include "protected_process/process.h"
 #include "utilities/utilities.h"	
 #include <iostream>
 
@@ -7,6 +8,7 @@
 int main()
 {
 	driver::initialise();
+	process::initialise();
 
 	while (true)
 	{
@@ -15,7 +17,7 @@ int main()
 
 		call_info.suspicious_modules_check.target_process_id = GetCurrentProcessId();
 
-		std::cout << (driver::send_call(call_info).response == driver::e_response::clean ? "no flags" : "found unsigned module in process") << '\n';
+		//std::cout << (driver::send_call(call_info).response == driver::e_response::clean ? "no flags" : "found unsigned module in process") << '\n';
 	}
 
 	driver::unload();

@@ -2,9 +2,6 @@
 #include "handles.h"
 
 #define CTL_CODE_T(code) CTL_CODE(FILE_DEVICE_UNKNOWN, code, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define IO_CODE_TEST CTL_CODE_T(0x1500)
-#define IO_CODE_INITIALISE CTL_CODE_T(0x1501)
-#define IO_CODE_CHECK_SUSPICIOUS_MODULES CTL_CODE_T(0x1502)
 
 UNICODE_STRING device_name = RTL_CONSTANT_STRING(L"\\Device\\darken-ac"),
 	device_symbolic_name = RTL_CONSTANT_STRING(L"\\DosDevices\\darken-ac");
@@ -28,7 +25,7 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 	switch (code)
 	{
-		case IO_CODE_TEST:
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::test)):
 		{
 			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 
@@ -36,7 +33,7 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 			break;
 		}
-		case IO_CODE_INITIALISE:
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::start_protections)):
 		{
 			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 
@@ -54,7 +51,7 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 			break;
 		}
-		case IO_CODE_CHECK_SUSPICIOUS_MODULES:
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_suspicious_modules)):
 		{
 			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 

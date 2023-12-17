@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClCompile Include="src\driver\driver.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\protected_process\process.cpp" />
     <ClCompile Include="src\utilities\utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\driver\driver.h" />
+    <ClInclude Include="src\protected_process\process.h" />
     <ClInclude Include="src\utilities\utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -17,7 +17,7 @@ namespace driver
 	enum class e_call_code : unsigned long
 	{
 		test = 0x1500,
-		initialise = 0x1501,
+		start_protections = 0x1501,
 		check_suspicious_modules = 0x1502
 	};
 
@@ -47,7 +47,7 @@ namespace driver
 
 	s_call_info send_call(s_call_info call_info);
 
-	void initialise(), unload();
+	void initialise(), unload(), start_protections(s_core_info core_info);
 
 	inline void* handle = nullptr;
 }

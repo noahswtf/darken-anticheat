@@ -13,19 +13,20 @@ void driver::initialise()
 	{
 		std::cout << "handle to driver invalid\n";
 	}
-
-	s_call_info call_info;
-	call_info.control_code = e_call_code::initialise;
-
-	call_info.core_info.user_mode_process_id = static_cast<unsigned long long>(GetCurrentProcessId());
-	call_info.core_info.protected_process_process_id = static_cast<unsigned long long>(GetCurrentProcessId()); // for now the 'protected process' IS the usermode
-
-	send_call(call_info);
 }
 
 void driver::unload()
 {
 	CloseHandle(handle);
+}
+
+void driver::start_protections(s_core_info core_info)
+{
+	s_call_info call_info;
+	call_info.control_code = e_call_code::start_protections;
+	call_info.core_info = core_info;
+
+	send_call(call_info);
 }
 
 driver::s_call_info driver::send_call(s_call_info call_info)

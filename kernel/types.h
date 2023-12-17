@@ -22,7 +22,9 @@ namespace communication
 
 	enum class e_call_code : unsigned long
 	{
-		test = 0x1500
+		test = 0x1500,
+		start_protections = 0x1501,
+		check_suspicious_modules = 0x1502
 	};
 
 	struct s_suspicious_modules_check
