@@ -51,11 +51,19 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 			break;
 		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_suspicious_modules)):
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_process_suspicious_modules)):
 		{
 			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
 
 			detections::process::find_suspicious_modules(call_info);
+
+			break;
+		}
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_process_suspicious_threads)):
+		{
+			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
+
+			detections::process::find_suspicious_threads(call_info);
 
 			break;
 		}

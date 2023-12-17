@@ -17,17 +17,25 @@ namespace communication
 	enum class e_flag_type
 	{
 		none,
-		suspicious_module_in_process
+		suspicious_module_in_process,
+		suspicious_thread
 	};
 
 	enum class e_call_code : unsigned long
 	{
 		test = 0x1500,
 		start_protections = 0x1501,
-		check_suspicious_modules = 0x1502
+		check_process_suspicious_modules = 0x1502,
+		check_process_suspicious_threads = 0x1503,
+		check_system_suspicious_threads = 0x1504
 	};
 
-	struct s_suspicious_modules_check
+	struct s_process_suspicious_modules_check
+	{
+		unsigned long long target_process_id;
+	};
+
+	struct s_process_suspicious_threads_check
 	{
 		unsigned long long target_process_id;
 	};
@@ -47,8 +55,8 @@ namespace communication
 
 		union
 		{
-			s_suspicious_modules_check suspicious_modules_check;
+			s_process_suspicious_modules_check process_suspicious_modules_check;
+			s_process_suspicious_threads_check process_suspicious_threads_check;
 		};
 	};
-
 }
