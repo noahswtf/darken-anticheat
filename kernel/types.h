@@ -1,5 +1,11 @@
 #pragma once
 
+enum class e_error
+{
+	success,
+	error
+};
+
 namespace communication
 {
 	enum class e_response : unsigned long long
@@ -19,10 +25,14 @@ namespace communication
 		test = 0x1500
 	};
 
-	struct s_blacklisted_modules_check
+	struct s_suspicious_modules_check
 	{
-		unsigned long long target_process_id = 0ull;
-		wchar_t* whitelisted_modules[4];
+		unsigned long long target_process_id;
+	};
+
+	struct s_core_info
+	{
+		unsigned long long user_mode_process_id = 0ull, protected_process_process_id = 0ull;
 	};
 
 	struct s_call_info
@@ -31,9 +41,12 @@ namespace communication
 		e_response response = e_response::flagged;
 		e_flag_type flag_type = e_flag_type::none;
 
+		s_core_info core_info;
+
 		union
 		{
-			s_blacklisted_modules_check blacklisted_modules_check;
+			s_suspicious_modules_check suspicious_modules_check;
 		};
 	};
+
 }

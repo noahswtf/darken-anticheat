@@ -2,22 +2,13 @@
 
 extern "C" NTKERNELAPI PPEB PsGetProcessPeb(PEPROCESS);
 
-detections::e_error detections::process::find_suspicious_modules(communication::s_call_info*& call_info)
+e_error detections::process::find_suspicious_modules(communication::s_call_info*& call_info)
 {
 	call_info->response = communication::e_response::clean;
 
-	if (!call_info->blacklisted_modules_check.whitelisted_modules || !call_info->blacklisted_modules_check.target_process_id)
-	{
-#ifdef DEBUG
-		DbgPrint("[darken-ac]: no whitelisted modules or null process id in [find_suspicious_modules].");
-#endif
-
-		return e_error::error;
-	}
-
 	PEPROCESS target_process;
 
-	if (!NT_SUCCESS(PsLookupProcessByProcessId(reinterpret_cast<HANDLE>(call_info->blacklisted_modules_check.target_process_id), &target_process)))
+	if (!call_info->suspicious_modules_check.target_process_id || !NT_SUCCESS(PsLookupProcessByProcessId(reinterpret_cast<HANDLE>(call_info->suspicious_modules_check.target_process_id), &target_process)))
 	{
 #ifdef DEBUG
 		DbgPrint("[darken-ac]: invalid process id in [find_suspicious_modules].");
@@ -51,12 +42,16 @@ detections::e_error detections::process::find_suspicious_modules(communication::
 
 		bool is_suspicious = false;
 
+		// we want to check if theyve just iterated through loaded modules and changed the base address to a false value
 		if (current_module->DllBase == process_peb->ImageBaseAddress)
 		{
 			modules_with_initial_base_address++;
 		}
 		else
 		{
+			// really simple way to check if file is signed, but some windows dlls (such as apphelp.dll)
+			// dont comply with this as they arent signed, so we should probably add some sanity checks
+
 			_IMAGE_DOS_HEADER* dos_header = reinterpret_cast<_IMAGE_DOS_HEADER*>(current_module->DllBase);
 			_IMAGE_NT_HEADERS64* nt_headers = reinterpret_cast<_IMAGE_NT_HEADERS64*>(reinterpret_cast<unsigned char*>(current_module->DllBase) + dos_header->e_lfanew);
 		
@@ -67,6 +62,7 @@ detections::e_error detections::process::find_suspicious_modules(communication::
 			}
 		}
 
+		// there should only ever be 1
 		if (2U <= modules_with_initial_base_address)
 		{
 			is_suspicious = true;
@@ -85,4 +81,3 @@ detections::e_error detections::process::find_suspicious_modules(communication::
 
 	return e_error::success;
 }
-

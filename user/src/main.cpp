@@ -18,6 +18,6 @@ int main()
 		std::cout << (driver::send_call(call_info).response == driver::e_response::clean ? "no flags" : "found unsigned module in process") << '\n';
 	}
 
-	driver::clean_up();
+	driver::unload();
 	return 0;
 }

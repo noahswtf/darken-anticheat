@@ -30,6 +30,9 @@
     <ClCompile Include="detections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="handles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detections.h">
@@ -38,7 +41,10 @@
     <ClInclude Include="structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="communication_types.h">
+    <ClInclude Include="types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="handles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

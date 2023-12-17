@@ -17,7 +17,8 @@ namespace driver
 	enum class e_call_code : unsigned long
 	{
 		test = 0x1500,
-		check_suspicious_modules = 0x1501
+		initialise = 0x1501,
+		check_suspicious_modules = 0x1502
 	};
 
 	struct s_suspicious_modules_check
@@ -25,11 +26,18 @@ namespace driver
 		unsigned long long target_process_id;
 	};
 
+	struct s_core_info
+	{
+		unsigned long long user_mode_process_id = 0ull, protected_process_process_id = 0ull;
+	};
+
 	struct s_call_info
 	{
 		e_call_code control_code = e_call_code::test;
 		e_response response = e_response::flagged;
 		e_flag_type flag_type = e_flag_type::none;
+
+		s_core_info core_info;
 
 		union
 		{
@@ -39,7 +47,7 @@ namespace driver
 
 	s_call_info send_call(s_call_info call_info);
 
-	void initialise(), clean_up();
+	void initialise(), unload();
 
 	inline void* handle = nullptr;
 }
