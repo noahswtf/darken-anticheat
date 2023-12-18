@@ -35,6 +35,8 @@ void process::initialise()
         CloseHandle(process_information.hThread);
 
         driver::start_protections(driver::s_core_info(current_process_id, protected_process_id));
+
+        process_id = protected_process_id;
     }
     else
     {

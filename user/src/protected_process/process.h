@@ -4,4 +4,6 @@
 namespace process
 {
 	void initialise(), unload();
+
+	inline unsigned long long process_id = 0ull;
 }
