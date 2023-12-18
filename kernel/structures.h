@@ -838,7 +838,7 @@ typedef struct _ETHREAD
     VOID* Win32StartAddress;                                                //0x4d0
     VOID* ChargeOnlySession;                                                //0x4d8
     VOID* LegacyPowerObject;                                                //0x4e0
-    struct _LIST_ENTRY ThreadListEntry;
+    struct _LIST_ENTRY ThreadListEntry;                                     //0x4e8
 } _ETHREAD, * _PETHREAD;
 
 //0x4 bytes (sizeof)

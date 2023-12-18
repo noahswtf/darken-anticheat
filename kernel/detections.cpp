@@ -1,9 +1,9 @@
 #include "detections.h"
 
+extern "C" NTKERNELAPI NTSTATUS ZwQuerySystemInformation(ULONG, PVOID, ULONG, PULONG);
 extern "C" NTKERNELAPI PPEB PsGetProcessPeb(PEPROCESS);
-extern "C" NTKERNELAPI void* PsGetThreadWin32Thread(PETHREAD);
 
-e_error detections::process::find_suspicious_modules(communication::s_call_info*& call_info)
+e_error detections::process::find_suspicious_modules(communication::s_call_info* call_info)
 {
 	call_info->response = communication::e_response::clean;
 
@@ -75,7 +75,9 @@ e_error detections::process::find_suspicious_modules(communication::s_call_info*
 			call_info->response = communication::e_response::flagged;
 			call_info->flag_type = communication::e_flag_type::suspicious_module_in_process;
 
+#ifdef DEBUG
 			DbgPrint("[darken-ac]: found process suspicious module: %ls", current_module->BaseDllName.Buffer);
+#endif
 		}
 	}
 
@@ -85,7 +87,7 @@ e_error detections::process::find_suspicious_modules(communication::s_call_info*
 	return e_error::success;
 }
 
-e_error detections::process::find_suspicious_threads(communication::s_call_info*& call_info)
+e_error detections::process::find_suspicious_threads(communication::s_call_info* call_info)
 {
 	call_info->response = communication::e_response::clean;
 
@@ -106,7 +108,7 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 	KeStackAttachProcess(pe_process, &apc);
 
 	PPEB process_peb = PsGetProcessPeb(pe_process);
-
+	
 	if (!process_peb)
 	{
 #ifdef DEBUG
@@ -134,18 +136,22 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 			unsigned long long module_base = reinterpret_cast<unsigned long long>(current_module->DllBase);
 			unsigned long long module_size = static_cast<unsigned long long>(current_module->SizeOfImage);
 
+			// if outside of valid module or null
 			if (!thread_start_address || (module_base < thread_start_address && thread_start_address < module_base + module_size))
 			{
 				is_suspicious = true;
+				break;
 			}
 		}
 
 		if (!is_suspicious)
 		{
 			call_info->response = communication::e_response::flagged;
-			call_info->flag_type = communication::e_flag_type::suspicious_thread;
+			call_info->flag_type = communication::e_flag_type::suspicious_thread_in_process;
 
-			DbgPrint("[darken-ac]: found process suspicious thread at address: 0x%p", current_thread->StartAddress);
+#ifdef DEBUG
+			DbgPrint("[darken-ac]: found process suspicious thread at address: 0x%llX", thread_start_address);
+#endif
 		}
 	}
 
@@ -155,7 +161,80 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 	return e_error::success;
 }
 
-e_error detections::system::find_suspicious_threads(communication::s_call_info*& call_info)
+e_error detections::system::find_suspicious_threads(communication::s_call_info* call_info)
 {
+	call_info->response = communication::e_response::clean;
 
+	// get the size of the process modules (as a whole)
+	unsigned long size_of_process_modules = 0ul;
+	ZwQuerySystemInformation(11ul, nullptr, size_of_process_modules, &size_of_process_modules);
+
+	if (!size_of_process_modules)
+	{
+#ifdef DEBUG
+		DbgPrint("[darken-ac]: unable to get size of system modules [find_system_suspicious_threads].");
+#endif
+		
+		return e_error::error;
+	}
+
+	PRTL_PROCESS_MODULES process_modules = static_cast<PRTL_PROCESS_MODULES>(ExAllocatePool2(POOL_FLAG_NON_PAGED, size_of_process_modules, 'drkn'));
+
+	if (!process_modules)
+	{
+#ifdef DEBUG
+		DbgPrint("[darken-ac]: unable to allocate pool for process modules [find_system_suspicious_threads].");
+#endif
+
+		return e_error::error;
+	}
+
+	// fill pool with the process modules
+	if (!NT_SUCCESS(ZwQuerySystemInformation(11ul, process_modules, size_of_process_modules, &size_of_process_modules)))
+	{
+#ifdef DEBUG
+		DbgPrint("[darken-ac]: unable to fetch system modules [find_system_suspicious_threads].");
+#endif
+
+		ExFreePoolWithTag(process_modules, 'drkn');
+		return e_error::error;
+	}
+
+	_PEPROCESS our_process = reinterpret_cast<_PEPROCESS>(IoGetCurrentProcess());
+
+	PLIST_ENTRY thread_list_head = &our_process->ThreadListHead;
+	for (PLIST_ENTRY thread_list = thread_list_head->Flink; thread_list != thread_list_head; thread_list = thread_list->Flink)
+	{
+		_PETHREAD current_thread = CONTAINING_RECORD(thread_list, _ETHREAD, ThreadListEntry);
+
+		HANDLE current_thread_id = current_thread->Cid.UniqueThread;
+		unsigned long long thread_start_address = reinterpret_cast<unsigned long long>(current_thread->Win32StartAddress);
+
+		bool is_suspicious = false;
+
+		for (unsigned long i = 0ul; i < process_modules->NumberOfModules; i++)
+		{
+			unsigned long long module_base = reinterpret_cast<unsigned long long>(process_modules->Modules[i].ImageBase);
+			unsigned long long module_size = static_cast<unsigned long long>(process_modules->Modules[i].ImageSize);
+
+			// if outside of valid module or null (yes some people set it to 0 even though it may flag patchguard)
+			if (!thread_start_address || (module_base < thread_start_address && thread_start_address < module_base + module_size))
+			{
+				is_suspicious = true;
+				break;
+			}
+		}
+
+		if (!is_suspicious)
+		{
+			call_info->response = communication::e_response::flagged;
+			call_info->flag_type = communication::e_flag_type::suspicious_thread_in_system;
+
+			DbgPrint("[darken-ac]: found system/kernel suspicious thread with id '%llu' at address: 0x%llX", reinterpret_cast<unsigned long long>(current_thread_id), thread_start_address);
+		}
+	}
+
+	ExFreePoolWithTag(process_modules, 'drkn');
+
+	return e_error::success;
 }

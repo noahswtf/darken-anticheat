@@ -67,6 +67,47 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 			break;
 		}
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_system_suspicious_threads)):
+		{
+			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
+
+			HANDLE thread_handle;
+			if (!NT_SUCCESS(PsCreateSystemThread(&thread_handle, THREAD_ALL_ACCESS, nullptr, nullptr, nullptr, reinterpret_cast<PKSTART_ROUTINE>(detections::system::find_suspicious_threads), call_info)))
+			{
+#ifdef DEBUG
+				DbgPrint("[darken-ac]: failed to create system thread for call [check_system_suspicious_threads].");
+#endif
+
+				call_info->response = communication::e_response::runtime_error;
+				break;
+			}
+
+			void* object = nullptr;
+			if (!NT_SUCCESS(ObReferenceObjectByHandle(thread_handle, THREAD_ALL_ACCESS, *PsThreadType, KernelMode, &object, nullptr)))
+			{
+#ifdef DEBUG
+				DbgPrint("[darken-ac]: failed reference object by handle [check_system_suspicious_threads].");
+#endif
+				
+				ZwClose(thread_handle);
+				call_info->response = communication::e_response::runtime_error;
+				break;
+			}
+
+			if (!NT_SUCCESS(KeWaitForSingleObject(object, Executive, KernelMode, 0, nullptr)))
+			{
+#ifdef DEBUG
+				DbgPrint("[darken-ac]: failed to wait for thread to finish [check_system_suspicious_threads].");
+#endif
+
+				call_info->response = communication::e_response::runtime_error;
+			}
+
+			ZwClose(thread_handle);
+			ObfDereferenceObject(object);
+
+			break;
+		}
 		default:
 		{
 			// so we know if the codes are correct etc

@@ -11,14 +11,16 @@ namespace communication
 	enum class e_response : unsigned long long
 	{
 		flagged,
-		clean
+		clean,
+		runtime_error
 	};
 
 	enum class e_flag_type
 	{
 		none,
 		suspicious_module_in_process,
-		suspicious_thread
+		suspicious_thread_in_process,
+		suspicious_thread_in_system
 	};
 
 	enum class e_call_code : unsigned long
