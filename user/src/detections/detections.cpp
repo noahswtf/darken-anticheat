@@ -26,3 +26,11 @@ driver::e_response detections::system::find_suspicious_threads()
 	
 	return driver::send_call(call_info).response;
 }
+
+driver::e_response detections::virtual_machine::check_in_virtual_machine()
+{
+	driver::s_call_info call_info = driver::s_call_info();
+	call_info.control_code = driver::e_call_code::check_in_virtual_machine;
+
+	return driver::send_call(call_info).response;
+}

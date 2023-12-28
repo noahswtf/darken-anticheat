@@ -14,10 +14,11 @@ namespace driver
 	enum class e_call_code : unsigned long
 	{
 		test = 0x1500,
-		start_protections = 0x1501,
-		check_process_suspicious_modules = 0x1502,
-		check_process_suspicious_threads = 0x1503,
-		check_system_suspicious_threads = 0x1504
+		start_protections,
+		check_process_suspicious_modules,
+		check_process_suspicious_threads,
+		check_system_suspicious_threads,
+		check_in_virtual_machine
 	};
 
 	struct s_process_suspicious_modules_check

@@ -26,7 +26,9 @@ int main()
 				&& detections::process::find_suspicious_modules(GetCurrentProcessId()) == driver::e_response::clean
 				&& detections::process::find_suspicious_threads(GetCurrentProcessId()) == driver::e_response::clean
 				&& detections::process::find_suspicious_modules(process::process_id) == driver::e_response::clean
-				&& detections::process::find_suspicious_threads(process::process_id) == driver::e_response::clean)
+				&& detections::process::find_suspicious_threads(process::process_id) == driver::e_response::clean
+				&& detections::virtual_machine::check_in_virtual_machine() == driver::e_response::clean
+				)
 			{
 				std::cout << "  [darken-anticheat] no flags.\n";
 			}

@@ -23,20 +23,18 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 	unsigned long code = IoGetCurrentIrpStackLocation(irp)->Parameters.DeviceIoControl.IoControlCode;
 
+	communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
+
 	switch (code)
 	{
 		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::test)):
 		{
-			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
-
 			call_info->response = communication::e_response::clean;
 
 			break;
 		}
 		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::start_protections)):
 		{
-			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
-
 			// make sure '/integritycheck' is in linker, otherwise we will get STATUS_ACCESS_DENIED
 			// when attempting to register callbacks
 			handles::permission_stripping::process_ids = call_info->core_info;
@@ -53,24 +51,18 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 		}
 		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_process_suspicious_modules)):
 		{
-			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
-
 			detections::process::find_suspicious_modules(call_info);
 
 			break;
 		}
 		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_process_suspicious_threads)):
 		{
-			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
-
 			detections::process::find_suspicious_threads(call_info);
 
 			break;
 		}
 		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_system_suspicious_threads)):
 		{
-			communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
-
 			HANDLE thread_handle;
 			if (!NT_SUCCESS(PsCreateSystemThread(&thread_handle, THREAD_ALL_ACCESS, nullptr, nullptr, nullptr, reinterpret_cast<PKSTART_ROUTINE>(detections::system::find_suspicious_threads), call_info)))
 			{
@@ -105,6 +97,13 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 			ZwClose(thread_handle);
 			ObfDereferenceObject(object);
+
+			break;
+		}
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_in_virtual_machine)):
+		{
+			// will add more checks for virtual machine, but dont think this should have its own call code
+			detections::virtual_machine::check_msr_usage(call_info);
 
 			break;
 		}

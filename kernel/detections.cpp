@@ -1,4 +1,5 @@
 #include "detections.h"
+#include <intrin.h>
 
 extern "C" NTKERNELAPI NTSTATUS ZwQuerySystemInformation(ULONG, PVOID, ULONG, PULONG);
 extern "C" NTKERNELAPI PPEB PsGetProcessPeb(PEPROCESS);
@@ -235,6 +236,30 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 	}
 
 	ExFreePoolWithTag(process_modules, 'drkn');
+
+	return e_error::success;
+}
+
+// credits to my good friend papstuc for telling me about this
+e_error detections::virtual_machine::check_msr_usage(communication::s_call_info* call_info)
+{
+	call_info->response = communication::e_response::clean;
+
+	for (unsigned long i = 0x40000000UL; i <= 0x4000FFFFUL; i++)
+	{
+		__try
+		{
+			// used to communicate between host and virtual machine
+			__readmsr(i);
+
+			// if it doesnt throw an exception, then we're in a vm
+			DbgPrint("[darken-ac]: found msr usage, we may be running under a virtual machine");
+
+			call_info->response = communication::e_response::flagged;
+			return e_error::success;
+		}
+		__except (1) {}
+	}
 
 	return e_error::success;
 }
