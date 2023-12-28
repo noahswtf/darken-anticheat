@@ -231,7 +231,9 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 			call_info->response = communication::e_response::flagged;
 			call_info->flag_type = communication::e_flag_type::suspicious_thread_in_system;
 
+#ifdef DEBUG
 			DbgPrint("[darken-ac]: found system/kernel suspicious thread with id '%llu' at address: 0x%llX", reinterpret_cast<unsigned long long>(current_thread_id), thread_start_address);
+#endif
 		}
 	}
 
@@ -245,6 +247,7 @@ e_error detections::virtual_machine::check_msr_usage(communication::s_call_info*
 {
 	call_info->response = communication::e_response::clean;
 
+	// these ranges are specially reserved (as per intel docs)
 	for (unsigned long i = 0x40000000UL; i <= 0x4000FFFFUL; i++)
 	{
 		__try
@@ -253,7 +256,9 @@ e_error detections::virtual_machine::check_msr_usage(communication::s_call_info*
 			__readmsr(i);
 
 			// if it doesnt throw an exception, then we're in a vm
+#ifdef DEBUG
 			DbgPrint("[darken-ac]: found msr usage, we may be running under a virtual machine");
+#endif
 
 			call_info->response = communication::e_response::flagged;
 			return e_error::success;

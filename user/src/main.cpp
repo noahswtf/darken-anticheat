@@ -39,6 +39,7 @@ int main()
 		}
 	}
 
+	process::unload();
 	driver::unload();
 	return 0;
 }
