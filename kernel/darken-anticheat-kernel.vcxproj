@@ -149,6 +149,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="shared.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="detections.h" />
     <ClInclude Include="handles.h" />

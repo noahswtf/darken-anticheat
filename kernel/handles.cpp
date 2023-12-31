@@ -44,7 +44,7 @@ e_error handles::permission_stripping::initialise()
 
 	OB_CALLBACK_REGISTRATION callback_registration = { 0 };
 	callback_registration.OperationRegistration = ob_operation_registration;
-	callback_registration.RegistrationContext = &process_ids; // passed in as context
+	callback_registration.RegistrationContext = &shared::process_ids; // passed in as context
 	callback_registration.Version = OB_FLT_REGISTRATION_VERSION;
 	callback_registration.Altitude = RTL_CONSTANT_STRING(L"1000"); // this is the priority
 	callback_registration.OperationRegistrationCount = 1U;

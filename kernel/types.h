@@ -20,7 +20,7 @@ namespace communication
 		none,
 		suspicious_module_in_process,
 		suspicious_thread_in_process,
-		thread_outside_of_valid_module
+		suspicious_thread_in_system
 	};
 
 	enum class e_call_code : unsigned long

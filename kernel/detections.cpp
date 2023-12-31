@@ -162,6 +162,22 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 	return e_error::success;
 }
 
+e_error is_thread_attached_to_process(unsigned long long process_id, _PETHREAD thread, bool* state)
+{
+	PEPROCESS process = nullptr;
+	
+	if (!NT_SUCCESS(PsLookupProcessByProcessId(reinterpret_cast<HANDLE>(process_id), &process)))
+	{
+		return e_error::error;
+	}
+
+	KAPC_STATE apc_state = *reinterpret_cast<PKAPC_STATE>(reinterpret_cast<unsigned long long>(thread) + 0x98ull);
+
+	*state = apc_state.Process == process;
+
+	return e_error::success;
+}
+
 e_error detections::system::find_suspicious_threads(communication::s_call_info* call_info)
 {
 	call_info->response = communication::e_response::clean;
@@ -196,7 +212,6 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 #ifdef DEBUG
 		DbgPrint("[darken-ac]: unable to fetch system modules [find_system_suspicious_threads].");
 #endif
-
 		ExFreePoolWithTag(process_modules, 'drkn');
 		return e_error::error;
 	}
@@ -213,6 +228,7 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 
 		bool is_suspicious = false;
 
+		// thread outside of valid module detection
 		for (unsigned long i = 0ul; i < process_modules->NumberOfModules; i++)
 		{
 			unsigned long long module_base = reinterpret_cast<unsigned long long>(process_modules->Modules[i].ImageBase);
@@ -224,6 +240,18 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 				is_suspicious = true;
 				break;
 			}
+		}
+
+		// thread apc attached to one of our protected processes
+		// reason why i thought this was a good addition is cause mmcopyvirtualmemory (widely used in cheats)
+		// attaches to the process and this will now be detected
+		bool thread_attached_to_usermode_process = false, thread_attached_to_protected_process = false;
+		is_thread_attached_to_process(shared::process_ids.user_mode_process_id, current_thread, &thread_attached_to_usermode_process);
+		is_thread_attached_to_process(shared::process_ids.protected_process_process_id, current_thread, &thread_attached_to_protected_process);
+
+		if (thread_attached_to_usermode_process || thread_attached_to_protected_process)
+		{
+			//is_suspicious = true;
 		}
 
 		if (!is_suspicious)

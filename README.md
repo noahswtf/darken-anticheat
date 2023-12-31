@@ -6,7 +6,8 @@ Free and open source solution for protecting your software/games against attacke
 - Handle permission stripping.
 - Detect usermode threads outside of a valid module.
 - Detect kernel threads outside of a valid module.
-- Detecting usage of msr register in reserved ranges (used for communication in a virtual machine)
+- Detecting kernel threads attached to a protected process.
+- Detecting usage of msr register in reserved ranges (used for communication in a virtual machine).
 
 # How To Use
 

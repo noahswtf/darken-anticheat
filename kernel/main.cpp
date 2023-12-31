@@ -37,7 +37,7 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 		{
 			// make sure '/integritycheck' is in linker, otherwise we will get STATUS_ACCESS_DENIED
 			// when attempting to register callbacks
-			handles::permission_stripping::process_ids = call_info->core_info;
+			shared::process_ids = call_info->core_info;
 			e_error error = handles::permission_stripping::initialise();
 
 #ifdef DEBUG

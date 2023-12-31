@@ -1,6 +1,6 @@
 #pragma once
 #include "structures.h"
-#include "types.h"
+#include "shared.h"
 
 namespace detections
 {

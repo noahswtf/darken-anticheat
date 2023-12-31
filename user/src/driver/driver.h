@@ -5,10 +5,11 @@ namespace driver
 {
 	enum class e_flag_type
 	{
-		none,
-		suspicious_module_in_process,
-		suspicious_thread_in_process,
-		suspicious_thread_in_system
+		user_process_contains_unsigned_module,
+		user_thread_outside_of_valid_module,
+		kernel_thread_outside_of_valid_module,
+		msr_vm_related_usage,
+		none
 	};
 
 	enum class e_call_code : unsigned long
