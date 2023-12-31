@@ -1,6 +1,6 @@
 #include "detections/detections.h"
 #include "driver/driver.h"
-#include "protected_process/process.h"
+#include "protected_process/protected_process.h"
 #include "utilities/utilities.h"	
 #include <iostream>
 
@@ -10,7 +10,7 @@
 int main()
 {
 	driver::initialise();
-	process::initialise();
+	protected_process::initialise();
 
 	std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
 
@@ -25,8 +25,8 @@ int main()
 			if (detections::system::find_suspicious_threads() == driver::e_response::clean
 				&& detections::process::find_suspicious_modules(GetCurrentProcessId()) == driver::e_response::clean
 				&& detections::process::find_suspicious_threads(GetCurrentProcessId()) == driver::e_response::clean
-				&& detections::process::find_suspicious_modules(process::process_id) == driver::e_response::clean
-				&& detections::process::find_suspicious_threads(process::process_id) == driver::e_response::clean
+				&& detections::process::find_suspicious_modules(protected_process::process_id) == driver::e_response::clean
+				&& detections::process::find_suspicious_threads(protected_process::process_id) == driver::e_response::clean
 				&& detections::virtual_machine::check_in_virtual_machine() == driver::e_response::clean
 				)
 			{
@@ -39,7 +39,7 @@ int main()
 		}
 	}
 
-	process::unload();
+	protected_process::unload();
 	driver::unload();
 	return 0;
 }

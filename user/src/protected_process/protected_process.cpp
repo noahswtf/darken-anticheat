@@ -1,9 +1,9 @@
-#include "process.h"
+#include "protected_process.h"
 #include "../driver/driver.h"
 #include <Windows.h>
 #include <string>
 
-void process::initialise()
+void protected_process::initialise()
 {
     STARTUPINFO startup_info;
     ZeroMemory(&startup_info, sizeof(STARTUPINFO));
@@ -44,7 +44,7 @@ void process::initialise()
     }
 }
 
-void process::unload()
+void protected_process::unload()
 {
     
 }

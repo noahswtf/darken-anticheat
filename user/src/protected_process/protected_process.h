@@ -1,7 +1,7 @@
 #pragma once
 #define PROTECTED_PROCESS_NAME "darken-anticheat-protected-process.exe"
 
-namespace process
+namespace protected_process
 {
 	void initialise(), unload();
 
