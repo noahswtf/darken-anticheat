@@ -1,9 +1,10 @@
 #include "protected_process.h"
 #include "../driver/driver.h"
+#include "../log/log.h"
 #include <Windows.h>
 #include <string>
 
-void protected_process::initialise()
+bool protected_process::load()
 {
     STARTUPINFO startup_info;
     ZeroMemory(&startup_info, sizeof(STARTUPINFO));
@@ -21,27 +22,34 @@ void protected_process::initialise()
 
     // erase file name
     unsigned long long file_name_start = current_directory.find_last_of('\\');
-    if (file_name_start != std::string::npos) current_directory.erase(file_name_start + 1ull);
+
+    if (file_name_start != std::string::npos)
+    {
+        current_directory.erase(file_name_start + 1ull);
+    }
 
     std::string protected_process_path(current_directory + '\\' + PROTECTED_PROCESS_NAME);
 
     if (CreateProcessA(protected_process_path.c_str(), nullptr, nullptr, nullptr, false, CREATE_NEW_CONSOLE, nullptr, nullptr, &startup_info, &process_information))
     {
-        unsigned long long protected_process_id = static_cast<unsigned long long>(process_information.dwProcessId),
-            current_process_id = static_cast<unsigned long long>(GetCurrentProcessId());
-
         // make sure there arent handles flying about
         CloseHandle(process_information.hProcess);
         CloseHandle(process_information.hThread);
 
-        driver::start_protections(driver::s_core_info(current_process_id, protected_process_id));
+        driver::s_protected_processes protected_processes = { };
+        protected_processes.user_mode_id = driver::host_process_id;
+        protected_processes.protected_process_id = static_cast<unsigned long long>(process_information.dwProcessId);
 
-        process_id = protected_process_id;
+        driver::initialise_protected_processes(protected_processes);
+
+        process_id = protected_processes.protected_process_id;
     }
     else
     {
-        printf("couldnt create process: %lu", GetLastError());
+        return false;
     }
+
+    return true;
 }
 
 void protected_process::unload()

@@ -24,30 +24,30 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="detections.cpp">
+    <ClCompile Include="src\detections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="handles.cpp">
+    <ClCompile Include="src\handles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="detections.h">
+    <ClInclude Include="src\detections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="structures.h">
+    <ClInclude Include="src\structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="types.h">
+    <ClInclude Include="src\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="handles.h">
+    <ClInclude Include="src\handles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared.h">
+    <ClInclude Include="src\shared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -149,6 +149,7 @@
     <ClInclude Include="src\detections\detections.h" />
     <ClInclude Include="src\driver\driver.h" />
     <ClInclude Include="src\driver\response.h" />
+    <ClInclude Include="src\log\log.h" />
     <ClInclude Include="src\protected_process\protected_process.h" />
     <ClInclude Include="src\utilities\utilities.h" />
   </ItemGroup>

@@ -47,5 +47,8 @@
     <ClInclude Include="src\protected_process\protected_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\log\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

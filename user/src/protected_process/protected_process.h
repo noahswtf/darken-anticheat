@@ -3,7 +3,8 @@
 
 namespace protected_process
 {
-	void initialise(), unload();
+	bool load();
+	void unload();
 
 	inline unsigned long long process_id = 0ull;
 }

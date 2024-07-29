@@ -8,7 +8,7 @@ e_error detections::process::find_suspicious_modules(communication::s_call_info*
 {
 	call_info->response = communication::e_response::clean;
 
-	PEPROCESS target_process;
+	PEPROCESS target_process = nullptr;
 
 	if (!call_info->process_suspicious_modules_check.target_process_id || !NT_SUCCESS(PsLookupProcessByProcessId(reinterpret_cast<HANDLE>(call_info->process_suspicious_modules_check.target_process_id), &target_process)))
 	{
@@ -105,7 +105,7 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 
 	_PEPROCESS process = reinterpret_cast<_PEPROCESS>(pe_process);
 
-	KAPC_STATE apc;
+	KAPC_STATE apc = { };
 	KeStackAttachProcess(pe_process, &apc);
 
 	PPEB process_peb = PsGetProcessPeb(pe_process);
@@ -122,14 +122,17 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 	}
 
 	PLIST_ENTRY thread_list_head = &process->ThreadListHead;
+	
 	for (PLIST_ENTRY thread_list = thread_list_head->Flink; thread_list != thread_list_head; thread_list = thread_list->Flink)
 	{
 		_PETHREAD current_thread = CONTAINING_RECORD(thread_list, _ETHREAD, ThreadListEntry);
-		unsigned long long thread_start_address = reinterpret_cast<unsigned long long>(current_thread->Win32StartAddress);
+		unsigned long long thread_start_address = reinterpret_cast<unsigned long long>(current_thread->StartAddress);
 
 		bool is_suspicious = false;
+		bool is_thread_inside_module = false;
 
 		PLIST_ENTRY module_list_head = &process_peb->Ldr->InMemoryOrderModuleList;
+
 		for (PLIST_ENTRY module_list = module_list_head->Flink; module_list != module_list_head; module_list = module_list->Flink)
 		{
 			_LDR_DATA_TABLE_ENTRY* current_module = CONTAINING_RECORD(module_list, _LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks);
@@ -137,15 +140,20 @@ e_error detections::process::find_suspicious_threads(communication::s_call_info*
 			unsigned long long module_base = reinterpret_cast<unsigned long long>(current_module->DllBase);
 			unsigned long long module_size = static_cast<unsigned long long>(current_module->SizeOfImage);
 
-			// if outside of valid module or null
-			if (!thread_start_address || (module_base < thread_start_address && thread_start_address < module_base + module_size))
+			// check if thread win32 start address is inside module, if it isn't then we will then flag the user
+			if (module_base <= thread_start_address && thread_start_address <= module_base + module_size)
 			{
-				is_suspicious = true;
+				is_thread_inside_module = true;
 				break;
 			}
 		}
 
-		if (!is_suspicious)
+		if (is_thread_inside_module == false)
+		{
+			is_suspicious = true;
+		}
+
+		if (is_suspicious == true)
 		{
 			call_info->response = communication::e_response::flagged;
 			call_info->flag_type = communication::e_flag_type::suspicious_thread_in_process;
@@ -212,13 +220,16 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 #ifdef DEBUG
 		DbgPrint("[darken-ac]: unable to fetch system modules [find_system_suspicious_threads].");
 #endif
+
 		ExFreePoolWithTag(process_modules, 'drkn');
+
 		return e_error::error;
 	}
 
 	_PEPROCESS our_process = reinterpret_cast<_PEPROCESS>(IoGetCurrentProcess());
 
 	PLIST_ENTRY thread_list_head = &our_process->ThreadListHead;
+
 	for (PLIST_ENTRY thread_list = thread_list_head->Flink; thread_list != thread_list_head; thread_list = thread_list->Flink)
 	{
 		_PETHREAD current_thread = CONTAINING_RECORD(thread_list, _ETHREAD, ThreadListEntry);
@@ -227,6 +238,7 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 		unsigned long long thread_start_address = reinterpret_cast<unsigned long long>(current_thread->Win32StartAddress);
 
 		bool is_suspicious = false;
+		bool is_thread_inside_module = false;
 
 		// thread outside of valid module detection
 		for (unsigned long i = 0ul; i < process_modules->NumberOfModules; i++)
@@ -234,27 +246,35 @@ e_error detections::system::find_suspicious_threads(communication::s_call_info* 
 			unsigned long long module_base = reinterpret_cast<unsigned long long>(process_modules->Modules[i].ImageBase);
 			unsigned long long module_size = static_cast<unsigned long long>(process_modules->Modules[i].ImageSize);
 
-			// if outside of valid module or null (yes some people set it to 0 even though it may flag patchguard)
-			if (!thread_start_address || (module_base < thread_start_address && thread_start_address < module_base + module_size))
+			// check if thread win32 start address is inside module, if it isn't then we will then flag the user
+			if (module_base <= thread_start_address && thread_start_address <= module_base + module_size)
 			{
-				is_suspicious = true;
+				is_thread_inside_module = true;
+
 				break;
 			}
+		}
+
+		if (is_thread_inside_module == false)
+		{
+			is_suspicious = true;
 		}
 
 		// thread apc attached to one of our protected processes
 		// reason why i thought this was a good addition is cause mmcopyvirtualmemory (widely used in cheats)
 		// attaches to the process and this will now be detected
-		bool thread_attached_to_usermode_process = false, thread_attached_to_protected_process = false;
-		is_thread_attached_to_process(shared::process_ids.user_mode_process_id, current_thread, &thread_attached_to_usermode_process);
-		is_thread_attached_to_process(shared::process_ids.protected_process_process_id, current_thread, &thread_attached_to_protected_process);
+		bool thread_attached_to_usermode_process = false;
+		bool thread_attached_to_protected_process = false;
+		
+		is_thread_attached_to_process(shared::protected_processes.user_mode_id, current_thread, &thread_attached_to_usermode_process);
+		is_thread_attached_to_process(shared::protected_processes.protected_process_id, current_thread, &thread_attached_to_protected_process);
 
-		if (thread_attached_to_usermode_process || thread_attached_to_protected_process)
+		if (thread_attached_to_usermode_process == true || thread_attached_to_protected_process == true)
 		{
-			//is_suspicious = true;
+			is_suspicious = true;
 		}
 
-		if (!is_suspicious)
+		if (is_suspicious == true)
 		{
 			call_info->response = communication::e_response::flagged;
 			call_info->flag_type = communication::e_flag_type::suspicious_thread_in_system;
@@ -291,7 +311,10 @@ e_error detections::virtual_machine::check_msr_usage(communication::s_call_info*
 			call_info->response = communication::e_response::flagged;
 			return e_error::success;
 		}
-		__except (1) {}
+		__except (1)
+		{
+
+		}
 	}
 
 	return e_error::success;

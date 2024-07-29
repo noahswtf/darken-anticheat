@@ -144,16 +144,16 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="detections.cpp" />
-    <ClCompile Include="handles.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\detections.cpp" />
+    <ClCompile Include="src\handles.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shared.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="detections.h" />
-    <ClInclude Include="handles.h" />
-    <ClInclude Include="structures.h" />
+    <ClInclude Include="src\shared.h" />
+    <ClInclude Include="src\types.h" />
+    <ClInclude Include="src\detections.h" />
+    <ClInclude Include="src\handles.h" />
+    <ClInclude Include="src\structures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

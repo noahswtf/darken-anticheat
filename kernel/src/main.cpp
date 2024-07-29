@@ -13,7 +13,8 @@ NTSTATUS ioctl_manage_call(PDEVICE_OBJECT device_object, PIRP irp)
 	irp->IoStatus.Information = 0ull;
 	irp->IoStatus.Status = STATUS_SUCCESS;
 
-	IoCompleteRequest(irp, IO_NO_INCREMENT);
+	IofCompleteRequest(irp, IO_NO_INCREMENT);
+
 	return STATUS_SUCCESS;
 }
 
@@ -33,19 +34,9 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 			break;
 		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::start_protections)):
+		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::initialise_protected_processes)):
 		{
-			// make sure '/integritycheck' is in linker, otherwise we will get STATUS_ACCESS_DENIED
-			// when attempting to register callbacks
-			shared::process_ids = call_info->core_info;
-			e_error error = handles::permission_stripping::initialise();
-
-#ifdef DEBUG
-			if (error == e_error::error)
-			{
-				DbgPrint("[darken-ac]: failed to initialise handle stripping.");
-			}
-#endif
+			shared::protected_processes = call_info->protected_processes;
 
 			break;
 		}
@@ -64,6 +55,7 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_system_suspicious_threads)):
 		{
 			HANDLE thread_handle;
+
 			if (!NT_SUCCESS(PsCreateSystemThread(&thread_handle, THREAD_ALL_ACCESS, nullptr, nullptr, nullptr, reinterpret_cast<PKSTART_ROUTINE>(detections::system::find_suspicious_threads), call_info)))
 			{
 #ifdef DEBUG
@@ -75,6 +67,7 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 			}
 
 			void* object = nullptr;
+
 			if (!NT_SUCCESS(ObReferenceObjectByHandle(thread_handle, THREAD_ALL_ACCESS, *PsThreadType, KernelMode, &object, nullptr)))
 			{
 #ifdef DEBUG
@@ -152,9 +145,21 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 		return sanity_status;
 	}
 	
-	driver_object->MajorFunction[IRP_MJ_CREATE] = driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
+	driver_object->MajorFunction[IRP_MJ_CREATE] = ioctl_manage_call;
+	driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
 	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
 	driver_object->DriverUnload = driver_unload;
+
+	// make sure '/integritycheck' is in linker, otherwise we will get STATUS_ACCESS_DENIED
+	// when attempting to register callbacks
+	e_error error = handles::permission_stripping::initialise();
+
+#ifdef DEBUG
+	if (error == e_error::error)
+	{
+		DbgPrint("[darken-ac]: failed to initialise handle stripping.");
+	}
+#endif
 
 	return sanity_status;
 }

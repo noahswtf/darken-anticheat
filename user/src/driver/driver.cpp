@@ -1,18 +1,26 @@
 #include "driver.h"
+#include "../log/log.h"
 #include <Windows.h>
-
-#include <iostream>
 
 #define IO_CODE(Code) CTL_CODE(FILE_DEVICE_UNKNOWN, Code, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
 
-void driver::initialise()
+namespace driver
+{
+	inline HANDLE handle = nullptr;
+}
+
+bool driver::load()
 {
 	handle = CreateFileA("\\\\.\\darken-ac", GENERIC_WRITE | GENERIC_READ | GENERIC_EXECUTE, 0UL, 0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM, 0);
 
 	if (handle == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "handle to driver invalid\n";
+		return false;
 	}
+
+	host_process_id = static_cast<unsigned long long>(GetCurrentProcessId());
+
+	return true;
 }
 
 void driver::unload()
@@ -20,11 +28,11 @@ void driver::unload()
 	CloseHandle(handle);
 }
 
-void driver::start_protections(s_core_info core_info)
+void driver::initialise_protected_processes(s_protected_processes protected_processes)
 {
 	s_call_info call_info;
-	call_info.control_code = e_call_code::start_protections;
-	call_info.core_info = core_info;
+	call_info.control_code = e_call_code::initialise_protected_processes;
+	call_info.protected_processes = protected_processes;
 
 	send_call(call_info);
 }
