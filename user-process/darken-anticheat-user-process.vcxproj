@@ -139,19 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\detections\detections.cpp" />
-    <ClCompile Include="src\driver\driver.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\protected_process\protected_process.cpp" />
-    <ClCompile Include="src\utilities\utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\detections\detections.h" />
-    <ClInclude Include="src\driver\driver.h" />
-    <ClInclude Include="src\driver\response.h" />
     <ClInclude Include="src\log\log.h" />
-    <ClInclude Include="src\protected_process\protected_process.h" />
-    <ClInclude Include="src\utilities\utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

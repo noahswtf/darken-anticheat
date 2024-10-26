@@ -18,35 +18,8 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\driver\driver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\detections\detections.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\protected_process\protected_process.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\driver\driver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\detections\detections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\driver\response.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\protected_process\protected_process.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\log\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>

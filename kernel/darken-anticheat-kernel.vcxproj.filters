@@ -27,28 +27,5 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\detections.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\handles.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\detections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\structures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\handles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
