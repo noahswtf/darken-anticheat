@@ -27,5 +27,16 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\handles\permission_stripping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\handles\permission_stripping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\log\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

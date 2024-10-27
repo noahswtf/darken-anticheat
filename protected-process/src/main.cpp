@@ -2,7 +2,7 @@
 
 int main()
 {
-	std::cout << "[darken-anticheat] - started sample protected process\n";
+	std::cout << "[darken-anticheat] - started sample protected process.\n";
 
 	system("pause");
 

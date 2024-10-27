@@ -39,9 +39,18 @@
     <ClCompile Include="..\user-shared\utilities\filesystem\filesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\protected_process\protected_process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\user-shared\driver\driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\log\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\protected_process\protected_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

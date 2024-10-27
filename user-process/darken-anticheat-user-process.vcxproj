@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)user-shared;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)user-shared;$(SolutionDir)global-shared;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
     <PublicModuleDirectories>$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)user-shared;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)user-shared;$(SolutionDir)global-shared;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
     <PublicModuleDirectories>$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
@@ -137,7 +137,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,21 +158,24 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\user-shared\detections\anti_debug\anti_debug.cpp" />
     <ClCompile Include="..\user-shared\detections\modules\modules.cpp" />
+    <ClCompile Include="..\user-shared\driver\driver.cpp" />
     <ClCompile Include="..\user-shared\utilities\datatype\datatype.cpp" />
     <ClCompile Include="..\user-shared\utilities\filesystem\filesystem.cpp" />
     <ClCompile Include="..\user-shared\utilities\http\http.cpp" />
     <ClCompile Include="..\user-shared\utilities\pdb\pdb.cpp" />
     <ClCompile Include="..\user-shared\utilities\pe\pe.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\protected_process\protected_process.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\log\log.h" />
+    <ClInclude Include="src\protected_process\protected_process.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
