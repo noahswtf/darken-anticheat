@@ -3,6 +3,7 @@
 #ifndef _detections_include_guard
 #define _detections_include_guard
 #include "anti_debug/anti_debug.h"
+#include "modules/modules.h"
 #endif
 
 #ifndef d_check_detection
