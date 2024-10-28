@@ -34,6 +34,9 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 	// todo: enumerate pspcid table to find threads 'manually'
 	// with my testing on Windows 11 24H2, thread ids go past 0x3000 boundary
 	// i believe that 0x4000 is the limit but feel free to make a change if its not
+
+	// reason we dont just enumerate the system process's thread list is because it can be unlinked easily
+	// for this they need to unlink it from pspcid table which is a lot more tedious than just modifying a linked list
 	for (uint64_t current_thread_id = 4; current_thread_id <= 0x4000; current_thread_id += 4)
 	{
 		uint64_t current_ethread = 0;
