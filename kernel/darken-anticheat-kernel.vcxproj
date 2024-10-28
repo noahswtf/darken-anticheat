@@ -157,6 +157,7 @@
     <ClInclude Include="src\handles\permission_stripping.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\offsets\offsets.h" />
+    <ClInclude Include="src\shared_data\shared_data.h" />
     <ClInclude Include="src\structures\kldr_data_table_entry.h" />
     <ClInclude Include="src\system\system_thread.h" />
     <ClInclude Include="src\utilities\ntkrnl.h" />

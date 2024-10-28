@@ -1,5 +1,6 @@
 #include "handles/permission_stripping.h"
 #include "system/system_thread.h"
+#include "shared_data/shared_data.h"
 #include "offsets/offsets.h"
 #include "log.h"
 
@@ -43,9 +44,11 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 	}
 	case d_control_code(communication::e_control_code::initialise_protected_processes):
 	{
-		if (handles::permission_stripping::protected_processes.anticheat_usermode_id == 0 && handles::permission_stripping::protected_processes.protected_process_id == 0)
+		// todo: check for protected process's termination to allow this to be re-set
+
+		if (shared_data::protected_processes.anticheat_usermode_id == 0 && shared_data::protected_processes.protected_process_id == 0)
 		{
-			handles::permission_stripping::protected_processes = call_info->protected_processes;
+			shared_data::protected_processes = call_info->protected_processes;
 
 			call_info->detection_status = communication::e_detection_status::clean;
 		}

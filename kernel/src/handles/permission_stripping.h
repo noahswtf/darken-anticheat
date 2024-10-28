@@ -7,7 +7,5 @@ namespace handles
 	{
 		bool load();
 		void unload();
-
-		inline communication::s_protected_processes protected_processes = { };
 	}
 }

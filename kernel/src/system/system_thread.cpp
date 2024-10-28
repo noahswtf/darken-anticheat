@@ -1,7 +1,9 @@
 #include "system_thread.h"
+#include "../shared_data/shared_data.h"
 #include "../utilities/ntkrnl.h"
 #include "../offsets/offsets.h"
 #include "../structures/kldr_data_table_entry.h"
+#include "../log.h"
 
 #include <ntifs.h>
 
@@ -22,6 +24,13 @@ bool check_thread_address_in_module_callback(uint64_t current_module_info, void*
 	}
 
 	return false;
+}
+
+bool is_thread_attached_to_process(uint64_t ethread, uint64_t eprocess)
+{
+	uint64_t thread_eprocess = *reinterpret_cast<uint64_t*>(ethread + offsets::kthread::apc_state + offsets::kapc_state::process);
+
+	return thread_eprocess == eprocess;
 }
 
 #pragma warning(push)
@@ -48,15 +57,21 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 			continue;
 		}
 
-		if (our_executing_thread == current_ethread)
+		uint64_t current_ethread_process = ntkrnl::get_thread_eprocess(current_ethread);
+
+		if (current_ethread_process == 0)
 		{
 			continue;
 		}
 
-		uint64_t current_thread_eprocess = ntkrnl::get_thread_eprocess(current_ethread);
-		uint64_t current_thread_process_id = *reinterpret_cast<uint64_t*>(current_thread_eprocess + offsets::eprocess::unique_process_id);
+		uint64_t current_ethread_process_id = ntkrnl::get_process_id(current_ethread_process);
 
-		if (current_thread_process_id != 4)
+		if (current_ethread_process_id != 4)
+		{
+			continue;
+		}
+
+		if (our_executing_thread == current_ethread) // won't happen cause our currently executing thread is an usermode one
 		{
 			continue;
 		}
@@ -69,6 +84,8 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 
 		if (current_thread_win32_start_address == 0) // yes, people do set it to 0 for some odd reason
 		{
+			d_log("[darken-anticheat] thread id: %llx has a NULL Win32StartAddress.\n", current_thread_id);
+
 			return communication::e_detection_status::flagged;
 		}
 
@@ -79,6 +96,17 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 		// will be set to 1337 if in a legimate module
 		if (enumerate_system_modules_callback_context != 1337)
 		{
+			d_log("[darken-anticheat] thread id: %llx has a Win32StartAddress (0x%llx) which resides outside of a valid kernel module.\n", current_thread_id, current_thread_win32_start_address);
+
+			return communication::e_detection_status::flagged;
+		}
+
+		// will detect KeStackAttachProcess and hence MmCopyVirtualMemory
+		if (is_thread_attached_to_process(current_ethread, shared_data::protected_processes.anticheat_usermode_id) == true
+			|| is_thread_attached_to_process(current_ethread, shared_data::protected_processes.protected_process_id) == true)
+		{
+			d_log("[darken-anticheat] thread id: %llx was attached to a protected process.\n", current_thread_id);
+
 			return communication::e_detection_status::flagged;
 		}
 	}

@@ -16,6 +16,7 @@ namespace offsets
 	namespace kthread
 	{
 		inline uint64_t apc_state = 0x98; // doesn't change at all (last checked: Windows 11 24H2)
+		inline uint64_t process = 0x220; // doesn't change at all (last checked: Windows 11 24H2)
 	}
 
 	namespace ethread

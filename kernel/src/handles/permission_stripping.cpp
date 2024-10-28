@@ -1,4 +1,5 @@
 #include "permission_stripping.h"
+#include "../shared_data/shared_data.h"
 #include "../log.h"
 #include <ntifs.h>
 
@@ -70,7 +71,7 @@ bool handles::permission_stripping::load()
 	OB_CALLBACK_REGISTRATION callback_registration = { };
 
 	callback_registration.OperationRegistration = &ob_operation_registration;
-	callback_registration.RegistrationContext = &protected_processes;
+	callback_registration.RegistrationContext = &shared_data::protected_processes;
 	callback_registration.Version = OB_FLT_REGISTRATION_VERSION;
 	callback_registration.Altitude = RTL_CONSTANT_STRING(L"361337"); // 360000 - 389999: FSFilter Activity Monitor
 	callback_registration.OperationRegistrationCount = 1;
