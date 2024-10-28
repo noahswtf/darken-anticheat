@@ -149,10 +149,16 @@
   <ItemGroup>
     <ClCompile Include="src\handles\permission_stripping.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\offsets\offsets.cpp" />
+    <ClCompile Include="src\system\system_thread.cpp" />
+    <ClCompile Include="src\utilities\ntkrnl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\handles\permission_stripping.h" />
-    <ClInclude Include="src\log\log.h" />
+    <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\offsets\offsets.h" />
+    <ClInclude Include="src\system\system_thread.h" />
+    <ClInclude Include="src\utilities\ntkrnl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
