@@ -14,5 +14,5 @@ namespace ntkrnl
 	// current_module_info will contain a pointer to: _KLDR_DATA_TABLE_ENTRY
 	typedef bool(*t_enumerate_modules_callback)(uint64_t current_module_info);
 
-	void enumerate_system_modules(uint64_t eprocess, t_enumerate_modules_callback callback);
+	void enumerate_system_modules(t_enumerate_modules_callback callback);
 }
