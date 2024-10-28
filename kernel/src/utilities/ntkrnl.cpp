@@ -1,7 +1,10 @@
 #include "ntkrnl.h"
 #include "../offsets/offsets.h"
+#include "../structures/kldr_data_table_entry.h"
 
 #include <ntifs.h>
+
+extern "C" PLIST_ENTRY PsLoadedModuleList;
 
 uint64_t ntkrnl::get_eprocess(uint64_t target_process_id)
 {
@@ -33,14 +36,32 @@ uint64_t ntkrnl::get_process_id(uint64_t eprocess)
 	return *reinterpret_cast<uint64_t*>(eprocess + offsets::eprocess::unique_process_id);
 }
 
+uint64_t ntkrnl::get_thread_eprocess(uint64_t ethread)
+{
+	return *reinterpret_cast<uint64_t*>(ethread + offsets::kthread::apc_state + offsets::kapc_state::process);
+}
+
 uint64_t ntkrnl::get_current_process()
 {
 	uint64_t current_thread = get_current_thread();
 
-	return *reinterpret_cast<uint64_t*>(current_thread + offsets::kthread::apc_state + offsets::kapc_state::process);
+	return get_thread_eprocess(current_thread);
 }
 
 uint64_t ntkrnl::get_current_thread()
 {
 	return __readgsqword(0x188);
+}
+
+void ntkrnl::enumerate_system_modules(uint64_t eprocess, t_enumerate_modules_callback callback)
+{
+	for (PLIST_ENTRY current_list_entry = PsLoadedModuleList->Flink; current_list_entry != PsLoadedModuleList; current_list_entry = current_list_entry->Flink)
+	{
+		_KLDR_DATA_TABLE_ENTRY* current_module_info = CONTAINING_RECORD(current_list_entry, _KLDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
+
+		if (callback(reinterpret_cast<uint64_t>(current_module_info)) == true)
+		{
+			return;
+		}
+	}
 }

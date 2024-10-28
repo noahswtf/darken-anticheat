@@ -56,5 +56,8 @@
     <ClInclude Include="src\offsets\offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\structures\kldr_data_table_entry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
