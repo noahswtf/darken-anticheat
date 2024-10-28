@@ -53,13 +53,13 @@ uint64_t ntkrnl::get_current_thread()
 	return __readgsqword(0x188);
 }
 
-void ntkrnl::enumerate_system_modules(uint64_t eprocess, t_enumerate_modules_callback callback)
+void ntkrnl::enumerate_system_modules(t_enumerate_modules_callback callback, void* context)
 {
 	for (PLIST_ENTRY current_list_entry = PsLoadedModuleList->Flink; current_list_entry != PsLoadedModuleList; current_list_entry = current_list_entry->Flink)
 	{
 		_KLDR_DATA_TABLE_ENTRY* current_module_info = CONTAINING_RECORD(current_list_entry, _KLDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
 
-		if (callback(reinterpret_cast<uint64_t>(current_module_info)) == true)
+		if (callback(context, reinterpret_cast<uint64_t>(current_module_info)) == true)
 		{
 			return;
 		}
