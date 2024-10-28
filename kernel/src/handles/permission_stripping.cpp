@@ -1,5 +1,5 @@
 #include "permission_stripping.h"
-#include "../log/log.h"
+#include "../log.h"
 #include <ntifs.h>
 
 namespace handles
