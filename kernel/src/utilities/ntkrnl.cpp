@@ -59,7 +59,7 @@ void ntkrnl::enumerate_system_modules(t_enumerate_modules_callback callback, voi
 	{
 		_KLDR_DATA_TABLE_ENTRY* current_module_info = CONTAINING_RECORD(current_list_entry, _KLDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
 
-		if (callback(context, reinterpret_cast<uint64_t>(current_module_info)) == true)
+		if (callback(reinterpret_cast<uint64_t>(current_module_info), context) == true)
 		{
 			return;
 		}

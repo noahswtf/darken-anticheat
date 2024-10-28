@@ -18,7 +18,7 @@ namespace detections
 }
 
 // todo: check for 'expected' modules to see if list has been tampered with
-e_detection_status detections::modules::local_process::is_unsigned_module_present()
+communication::e_detection_status detections::modules::local_process::is_unsigned_module_present()
 {
 	PPEB process_peb = reinterpret_cast<PPEB>(__readgsqword(0x60));
 
@@ -43,11 +43,11 @@ e_detection_status detections::modules::local_process::is_unsigned_module_presen
 		// we check the pdb due to some system dlls (such as apphelp.dll) not being digitally signed
 		if (utilities::pe::is_digitally_signed(module_path) == false && utilities::pe::has_pdb_on_microsoft_symbol_server(module_path) == false)
 		{
-			return e_detection_status::flagged;
+			return communication::e_detection_status::flagged;
 		}
 
 		modules_checked_already.push_back(module_path);
 	}
 
-	return e_detection_status::clean;
+	return communication::e_detection_status::clean;
 }

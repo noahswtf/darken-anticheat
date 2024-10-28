@@ -1,10 +1,10 @@
 #pragma once
-#include "../detections_status.h"
+#include <communication_types.h>
 
 namespace detections
 {
 	namespace anti_debug
 	{
-		e_detection_status is_peb_debug_flag_present();
+		communication::e_detection_status is_peb_debug_flag_present();
 	}
 }

@@ -17,7 +17,8 @@ namespace communication
 	enum e_control_code : uint32_t
 	{
 		test = 1,
-		initialise_protected_processes
+		initialise_protected_processes,
+		is_suspicious_system_thread_present
 	};
 
 	enum class e_detection_status : uint8_t

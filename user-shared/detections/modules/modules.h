@@ -1,5 +1,5 @@
 #pragma once
-#include "../detections_status.h"
+#include <communication_types.h>
 
 namespace detections
 {
@@ -7,7 +7,7 @@ namespace detections
 	{
 		namespace local_process
 		{
-			e_detection_status is_unsigned_module_present();
+			communication::e_detection_status is_unsigned_module_present();
 		}
 	}
 }

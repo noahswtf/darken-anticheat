@@ -32,6 +32,7 @@ int main()
 	{
 		d_check_detection(detections::anti_debug::is_peb_debug_flag_present);
 		d_check_detection(detections::modules::local_process::is_unsigned_module_present);
+		d_check_detection(detections::threads::is_suspicious_system_thread_present);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}

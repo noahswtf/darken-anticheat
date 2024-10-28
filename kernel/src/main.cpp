@@ -1,4 +1,5 @@
 #include "handles/permission_stripping.h"
+#include "system/system_thread.h"
 #include "offsets/offsets.h"
 #include "log.h"
 
@@ -52,6 +53,12 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 		{
 			call_info->detection_status = communication::e_detection_status::runtime_error;
 		}
+
+		break;
+	}
+	case d_control_code(communication::e_control_code::is_suspicious_system_thread_present):
+	{
+		call_info->detection_status = system::system_thread::is_suspicious_thread_present();
 
 		break;
 	}
