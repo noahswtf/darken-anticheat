@@ -35,10 +35,6 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 		return OB_PREOP_SUCCESS;
 	}
 
-	uint64_t current_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(current_process));
-
-	UNREFERENCED_PARAMETER(current_process_id);
-
 	uint64_t target_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(target_process));
 
 	if (target_process_id == protected_processes->anticheat_usermode_id || target_process_id == protected_processes->protected_process_id)
@@ -50,7 +46,11 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 			pre_operation_information->Parameters->CreateHandleInformation.DesiredAccess = (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION) :
 			pre_operation_information->Parameters->DuplicateHandleInformation.DesiredAccess = (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION);
 	
+		uint64_t current_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(current_process));
+
 		d_log("[darken-anticheat] blocked handle being opened to (process id: 0x%llx) from (process id: 0x%llx).\n", target_process_id, current_process_id);
+	
+		UNREFERENCED_PARAMETER(current_process_id);
 	}
 
 	return OB_PREOP_SUCCESS;
