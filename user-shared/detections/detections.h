@@ -3,6 +3,7 @@
 #ifndef _detections_include_guard
 #define _detections_include_guard
 #include "anti_debug/anti_debug.h"
+#include "patchguard/patchguard.h"
 #include "threads/threads.h"
 #include "modules/modules.h"
 #endif

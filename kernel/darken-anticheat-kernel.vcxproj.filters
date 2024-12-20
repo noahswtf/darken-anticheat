@@ -39,6 +39,9 @@
     <ClCompile Include="src\offsets\offsets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\patchguard\patchguard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\handles\permission_stripping.h">
@@ -62,5 +65,13 @@
     <ClInclude Include="src\shared_data\shared_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\patchguard\patchguard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\patchguard\patchguard_assembler.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

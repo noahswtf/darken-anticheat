@@ -34,6 +34,10 @@ int main()
 		d_check_detection(detections::modules::local_process::is_unsigned_module_present);
 		d_check_detection(detections::threads::is_suspicious_system_thread_present);
 
+		// if patchguard checks are being violated or if patchguard context not present
+		// then uncommenting next line will cause a system crash
+		//d_check_detection(detections::patchguard::trigger_bugcheck);
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 

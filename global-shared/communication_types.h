@@ -18,7 +18,8 @@ namespace communication
 	{
 		test = 1,
 		initialise_protected_processes,
-		is_suspicious_system_thread_present
+		is_suspicious_system_thread_present,
+		trigger_patchguard_bugcheck
 	};
 
 	enum class e_detection_status : uint8_t

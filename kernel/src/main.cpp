@@ -1,6 +1,8 @@
 #include "handles/permission_stripping.h"
 #include "system/system_thread.h"
 #include "shared_data/shared_data.h"
+#include "patchguard/patchguard.h"
+#include "utilities/ntkrnl.h"
 #include "offsets/offsets.h"
 #include "log.h"
 
@@ -44,9 +46,9 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 	}
 	case d_control_code(communication::e_control_code::initialise_protected_processes):
 	{
-		// todo: check for protected process's termination to allow this to be re-set
-
-		if (shared_data::protected_processes.anticheat_usermode_id == 0 && shared_data::protected_processes.protected_process_id == 0)
+		if ((shared_data::protected_processes.anticheat_usermode_id == 0 && shared_data::protected_processes.protected_process_id == 0)
+			|| (shared_data::protected_processes.protected_process_id != 0 && ntkrnl::get_eprocess(shared_data::protected_processes.protected_process_id)) // this line is checking if cached protected process is no longer running, leaving a new context ready to be used
+			)
 		{
 			shared_data::protected_processes = call_info->protected_processes;
 
@@ -62,6 +64,14 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 	case d_control_code(communication::e_control_code::is_suspicious_system_thread_present):
 	{
 		call_info->detection_status = system::system_thread::is_suspicious_thread_present();
+
+		break;
+	}
+	case d_control_code(communication::e_control_code::trigger_patchguard_bugcheck):
+	{
+		patchguard::trigger_bugcheck();
+
+		call_info->detection_status = communication::e_detection_status::clean;
 
 		break;
 	}
@@ -122,6 +132,9 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 	driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
 	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
 	driver_object->DriverUnload = driver_unload;
+
+	// NOTE: if you are testing on a system with patchguard disabled, uncommenting this next line WILL crash your system
+	//patchguard::trigger_bugcheck(); // im not sure about this line yet, control over the idt could lead them straight to this routine
 
 	return STATUS_SUCCESS;
 }
