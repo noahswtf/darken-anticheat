@@ -71,7 +71,7 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 			continue;
 		}
 
-		if (our_executing_thread == current_ethread) // won't happen cause our currently executing thread is an usermode one
+		if (our_executing_thread == current_ethread) // won't happen cause our currently executing thread is not one pertaining to the system process
 		{
 			continue;
 		}

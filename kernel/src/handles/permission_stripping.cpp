@@ -36,6 +36,9 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 	}
 
 	uint64_t current_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(current_process));
+
+	UNREFERENCED_PARAMETER(current_process_id);
+
 	uint64_t target_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(target_process));
 
 	if (target_process_id == protected_processes->anticheat_usermode_id || target_process_id == protected_processes->protected_process_id)
