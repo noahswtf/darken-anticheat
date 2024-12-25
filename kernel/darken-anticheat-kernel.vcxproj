@@ -63,6 +63,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -71,9 +72,11 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <IncludePath>$(SolutionDir)global-shared;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <IncludePath>$(SolutionDir)global-shared;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -93,7 +96,7 @@
     </ClCompile>
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;DEBUG;_DARKEN_KERNEL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EntryPointSymbol>driver_entry</EntryPointSymbol>
@@ -109,6 +112,7 @@
     </ClCompile>
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;_DARKEN_KERNEL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EntryPointSymbol>driver_entry</EntryPointSymbol>
@@ -144,18 +148,34 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\detections.cpp" />
-    <ClCompile Include="src\handles.cpp" />
+    <ClCompile Include="src\handles\permission_stripping.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\offsets\offsets.cpp" />
+    <ClCompile Include="src\patchguard\patchguard.cpp" />
+    <ClCompile Include="src\process\process_thread.cpp" />
+    <ClCompile Include="src\system\system_thread.cpp" />
+    <ClCompile Include="src\utilities\ntkrnl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\shared.h" />
-    <ClInclude Include="src\types.h" />
-    <ClInclude Include="src\detections.h" />
-    <ClInclude Include="src\handles.h" />
-    <ClInclude Include="src\structures.h" />
+    <ClInclude Include="src\handles\permission_stripping.h" />
+    <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\offsets\offsets.h" />
+    <ClInclude Include="src\patchguard\patchguard.h" />
+    <ClInclude Include="src\process\process_thread.h" />
+    <ClInclude Include="src\shared_data\shared_data.h" />
+    <ClInclude Include="src\structures\kldr_data_table_entry.h" />
+    <ClInclude Include="src\structures\ldr_data_table_entry.h" />
+    <ClInclude Include="src\structures\ldr_dll_load_reason.h" />
+    <ClInclude Include="src\structures\peb_ldr_data.h" />
+    <ClInclude Include="src\structures\_peb.h" />
+    <ClInclude Include="src\system\system_thread.h" />
+    <ClInclude Include="src\utilities\ntkrnl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\patchguard\patchguard_assembler.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

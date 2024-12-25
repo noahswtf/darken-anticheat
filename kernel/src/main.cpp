@@ -1,10 +1,21 @@
-#include "detections.h"
-#include "handles.h"
+#include "handles/permission_stripping.h"
+#include "system/system_thread.h"
+#include "process/process_thread.h"
+#include "shared_data/shared_data.h"
+#include "patchguard/patchguard.h"
+#include "utilities/ntkrnl.h"
+#include "offsets/offsets.h"
+#include "log.h"
 
-#define CTL_CODE_T(code) CTL_CODE(FILE_DEVICE_UNKNOWN, code, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#include <ntifs.h>
 
-UNICODE_STRING device_name = RTL_CONSTANT_STRING(L"\\Device\\darken-ac"),
-	device_symbolic_name = RTL_CONSTANT_STRING(L"\\DosDevices\\darken-ac");
+#define d_control_code(code) CTL_CODE(FILE_DEVICE_UNKNOWN, code, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+
+namespace driver_info
+{
+	UNICODE_STRING device_name = RTL_CONSTANT_STRING(L"\\Device\\darken-ac");
+	UNICODE_STRING device_symbolic_name = RTL_CONSTANT_STRING(L"\\DosDevices\\darken-ac");
+}
 
 NTSTATUS ioctl_manage_call(PDEVICE_OBJECT device_object, PIRP irp)
 {
@@ -28,91 +39,59 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 	switch (code)
 	{
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::test)):
+	case d_control_code(communication::e_control_code::test):
+	{
+		call_info->detection_status = communication::e_detection_status::clean;
+
+		break;
+	}
+	case d_control_code(communication::e_control_code::initialise_protected_processes):
+	{
+		if ((shared_data::protected_processes.anticheat_usermode_id == 0 && shared_data::protected_processes.protected_process_id == 0)
+			|| (shared_data::protected_processes.protected_process_id != 0 && ntkrnl::get_eprocess(shared_data::protected_processes.protected_process_id)) // this line is checking if cached protected process is no longer running, leaving a new context ready to be used
+			)
 		{
-			call_info->response = communication::e_response::clean;
+			shared_data::protected_processes = call_info->protected_processes;
 
-			break;
+			call_info->detection_status = communication::e_detection_status::clean;
 		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::initialise_protected_processes)):
+		else
 		{
-			shared::protected_processes = call_info->protected_processes;
-
-			break;
+			call_info->detection_status = communication::e_detection_status::runtime_error;
 		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_process_suspicious_modules)):
-		{
-			detections::process::find_suspicious_modules(call_info);
 
-			break;
-		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_process_suspicious_threads)):
-		{
-			detections::process::find_suspicious_threads(call_info);
+		break;
+	}
+	case d_control_code(communication::e_control_code::is_suspicious_system_thread_present):
+	{
+		call_info->detection_status = system::system_thread::is_suspicious_thread_present();
 
-			break;
-		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_system_suspicious_threads)):
-		{
-			HANDLE thread_handle;
+		break;
+	}
+	case d_control_code(communication::e_control_code::is_suspicious_process_thread_present):
+	{
+		call_info->detection_status = process::process_thread::is_suspicious_thread_present(call_info->is_suspicious_process_thread_present);
 
-			if (!NT_SUCCESS(PsCreateSystemThread(&thread_handle, THREAD_ALL_ACCESS, nullptr, nullptr, nullptr, reinterpret_cast<PKSTART_ROUTINE>(detections::system::find_suspicious_threads), call_info)))
-			{
-#ifdef DEBUG
-				DbgPrint("[darken-ac]: failed to create system thread for call [check_system_suspicious_threads].");
-#endif
+		break;
+	}
+	case d_control_code(communication::e_control_code::trigger_patchguard_bugcheck):
+	{
+		patchguard::trigger_bugcheck();
 
-				call_info->response = communication::e_response::runtime_error;
-				break;
-			}
+		call_info->detection_status = communication::e_detection_status::clean;
 
-			void* object = nullptr;
+		break;
+	}
+	default:
+	{
+		d_log("[darken-anticheat] ioctl code is invalid, received %lu.\n", code);
 
-			if (!NT_SUCCESS(ObReferenceObjectByHandle(thread_handle, THREAD_ALL_ACCESS, *PsThreadType, KernelMode, &object, nullptr)))
-			{
-#ifdef DEBUG
-				DbgPrint("[darken-ac]: failed reference object by handle [check_system_suspicious_threads].");
-#endif
-				
-				ZwClose(thread_handle);
-				call_info->response = communication::e_response::runtime_error;
-				break;
-			}
-
-			if (!NT_SUCCESS(KeWaitForSingleObject(object, Executive, KernelMode, 0, nullptr)))
-			{
-#ifdef DEBUG
-				DbgPrint("[darken-ac]: failed to wait for thread to finish [check_system_suspicious_threads].");
-#endif
-
-				call_info->response = communication::e_response::runtime_error;
-			}
-
-			ZwClose(thread_handle);
-			ObfDereferenceObject(object);
-
-			break;
-		}
-		case CTL_CODE_T(static_cast<unsigned long>(communication::e_call_code::check_in_virtual_machine)):
-		{
-			// will add more checks for virtual machine, but dont think this should have its own call code
-			detections::virtual_machine::check_msr_usage(call_info);
-
-			break;
-		}
-		default:
-		{
-			// so we know if the codes are correct etc
-#ifdef DEBUG
-			DbgPrint("[darken-ac]: ioctl code is invalid, received %lu.", code);
-#endif
-
-			break;
-		}
+		break;
+	}
 	}
 
-	irp->IoStatus.Status = STATUS_SUCCESS;
 	irp->IoStatus.Information = sizeof(communication::s_call_info);
+	irp->IoStatus.Status = STATUS_SUCCESS;
 
 	IoCompleteRequest(irp, IO_NO_INCREMENT);
 
@@ -124,42 +103,52 @@ void driver_unload(PDRIVER_OBJECT driver_object)
 	handles::permission_stripping::unload();
 
 	IoDeleteDevice(driver_object->DeviceObject);
-	IoDeleteSymbolicLink(&device_symbolic_name);
+	IoDeleteSymbolicLink(&driver_info::device_symbolic_name);
 }
 
 NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_path)
 {
-	UNREFERENCED_PARAMETER(driver_object);
 	UNREFERENCED_PARAMETER(registry_path);
 
-	IoCreateSymbolicLink(&device_symbolic_name, &device_name);
-
-	NTSTATUS sanity_status = IoCreateDevice(driver_object, 0, &device_name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &driver_object->DeviceObject);
-
-	if (!NT_SUCCESS(sanity_status))
+	if (offsets::load() == false)
 	{
-#ifdef DEBUG
-		DbgPrint("[darken-ac]: unable to create io device.");
-#endif
-		
-		return sanity_status;
+		d_log("[darken-anticheat] failed to calculate offsets, are we on an unsupported Windows version?\n");
+
+		return STATUS_ABANDONED;
 	}
-	
+
+	if (handles::permission_stripping::load() == false)
+	{
+		d_log("[darken-anticheat] failed to load process handle permission stripping.\n");
+
+		return STATUS_ABANDONED;
+	}
+
 	driver_object->MajorFunction[IRP_MJ_CREATE] = ioctl_manage_call;
 	driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
 	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
 	driver_object->DriverUnload = driver_unload;
 
-	// make sure '/integritycheck' is in linker, otherwise we will get STATUS_ACCESS_DENIED
-	// when attempting to register callbacks
-	e_error error = handles::permission_stripping::initialise();
+	NTSTATUS sanity_status = IoCreateSymbolicLink(&driver_info::device_symbolic_name, &driver_info::device_name);
 
-#ifdef DEBUG
-	if (error == e_error::error)
+	if (NT_SUCCESS(sanity_status) == false)
 	{
-		DbgPrint("[darken-ac]: failed to initialise handle stripping.");
-	}
-#endif
+		d_log("[darken-anticheat] unable to create symbolic link between device names.\n");
 
-	return sanity_status;
+		return sanity_status;
+	}
+
+	sanity_status = IoCreateDevice(driver_object, 0, &driver_info::device_name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &driver_object->DeviceObject);
+
+	if (NT_SUCCESS(sanity_status) == false)
+	{
+		d_log("[darken-anticheat] unable to create io device.\n");
+
+		return sanity_status;
+	}
+
+	// NOTE: if you are testing on a system with patchguard disabled, uncommenting this next line WILL crash your system
+	//patchguard::trigger_bugcheck(); // im not sure about this line yet, control over the idt could lead them straight to this routine
+
+	return STATUS_SUCCESS;
 }

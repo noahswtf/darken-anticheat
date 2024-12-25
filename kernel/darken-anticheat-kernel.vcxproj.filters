@@ -27,28 +27,69 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\detections.cpp">
+    <ClCompile Include="src\handles\permission_stripping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\handles.cpp">
+    <ClCompile Include="src\system\system_thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\ntkrnl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\offsets\offsets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\patchguard\patchguard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\process\process_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\detections.h">
+    <ClInclude Include="src\handles\permission_stripping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\structures.h">
+    <ClInclude Include="src\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\types.h">
+    <ClInclude Include="src\system\system_thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\handles.h">
+    <ClInclude Include="src\utilities\ntkrnl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\shared.h">
+    <ClInclude Include="src\offsets\offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\structures\kldr_data_table_entry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared_data\shared_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\patchguard\patchguard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\process\process_thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\structures\_peb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\structures\peb_ldr_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\structures\ldr_data_table_entry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\structures\ldr_dll_load_reason.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\patchguard\patchguard_assembler.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
