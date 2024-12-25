@@ -42,10 +42,10 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 		// todo: send flags when we get here and be able to differenciate between malicious creators or not
 		// might have to monitor whitelisted processes too to prevent people abusing them by injecting dlls into them and then opening handles from there
 
-		/*pre_operation_information->Operation == OB_OPERATION_HANDLE_CREATE ?
+		pre_operation_information->Operation == OB_OPERATION_HANDLE_CREATE ?
 			pre_operation_information->Parameters->CreateHandleInformation.DesiredAccess = (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION) :
 			pre_operation_information->Parameters->DuplicateHandleInformation.DesiredAccess = (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION);
-	*/
+	
 		uint64_t current_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(current_process));
 
 		d_log("[darken-anticheat] blocked handle being opened to (process id: 0x%llx) from (process id: 0x%llx).\n", target_process_id, current_process_id);
