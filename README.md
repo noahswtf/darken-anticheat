@@ -8,6 +8,8 @@ Open source solution for protecting your software against tampering and reverse 
 - Detects system threads which are attached to any of our protected processes.
 - Detects process threads which have a start address outside of any legitimate module in the respective protected process.
 - Detects debugged attached via the PEB's `BeingDebugged` byte.
+- Force-triggering PatchGuard (KPP) checks to run (causes bugcheck to occur if there are any violations of PatchGuard's checks).
+- Causing bugcheck if PatchGuard (KPP) is disabled / has an invalid context.
 
 # Licensing
 This project has been placed under the [GNU General Public License](LICENSE), if there are any specific enquiries regarding usage, please contact the founder of the project (noahswtf).
