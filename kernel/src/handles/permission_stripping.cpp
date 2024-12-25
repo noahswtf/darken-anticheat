@@ -11,7 +11,7 @@ namespace handles
 	}
 }
 
-#define PROCESS_QUERY_LIMITED_INFORMATION 0x1000
+#define d_process_query_limited_information 0x1000
 
 OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_processes* protected_processes, POB_PRE_OPERATION_INFORMATION pre_operation_information)
 {
@@ -43,8 +43,8 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 		// might have to monitor whitelisted processes too to prevent people abusing them by injecting dlls into them and then opening handles from there
 
 		pre_operation_information->Operation == OB_OPERATION_HANDLE_CREATE ?
-			pre_operation_information->Parameters->CreateHandleInformation.DesiredAccess = (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION) :
-			pre_operation_information->Parameters->DuplicateHandleInformation.DesiredAccess = (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION);
+			pre_operation_information->Parameters->CreateHandleInformation.DesiredAccess = (SYNCHRONIZE | d_process_query_limited_information) :
+			pre_operation_information->Parameters->DuplicateHandleInformation.DesiredAccess = (SYNCHRONIZE | d_process_query_limited_information);
 	
 		uint64_t current_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(current_process));
 
