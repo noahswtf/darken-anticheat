@@ -39,7 +39,7 @@ communication::e_detection_status process::process_thread::is_suspicious_thread_
 	// todo: walk page tables ourselves to check if translation succeeds, not using MmIsAddressValid
 	if (protected_process_peb == nullptr || MmIsAddressValid(protected_process_peb) == false)
 	{
-		d_log("[darken-anticheat][process::process_thread::is_suspicious_thread_present] unable to get peb of protected process with id: 0xllx.\n", is_suspicious_process_thread_present.process_id);
+		d_log("[darken-anticheat][process::process_thread::is_suspicious_thread_present] unable to get peb of protected process with id: 0x%llx.\n", is_suspicious_process_thread_present.process_id);
 
 		KeUnstackDetachProcess(&apc_state);
 
