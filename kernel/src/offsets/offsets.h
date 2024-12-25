@@ -21,6 +21,7 @@ namespace offsets
 
 	namespace ethread
 	{
+		inline uint64_t start_address = 0x600; // doesn't change until Windows 10 1607, Windows 10 2004, Windows 11 24H2(last checked: Windows 11 24H2)
 		inline uint64_t win32_start_address = 0x680; // doesn't change until Windows 10 1607, Windows 10 2004, Windows 11 24H2(last checked: Windows 11 24H2)
 	}
 
@@ -33,5 +34,10 @@ namespace offsets
 	{
 		inline uint64_t unique_process_id = 0x2E8; // doesn't change until Windows 10 1703, Windows 10 2004, Windows 11 24H2 (last checked: Windows 11 24H2)
 		inline uint64_t active_process_links = 0; // always the same as (unique_process_id + 8) (last checked: Windows 11 24H2)
+	}
+
+	namespace ldr_data_table_entry
+	{
+		inline uint64_t in_memory_order_links = 0x10;
 	}
 }

@@ -14,11 +14,17 @@ namespace communication
 		uint64_t protected_process_id;
 	};
 
+	struct s_is_suspicious_process_thread_present
+	{
+		uint64_t process_id;
+	};
+
 	enum e_control_code : uint32_t
 	{
 		test = 1,
 		initialise_protected_processes,
 		is_suspicious_system_thread_present,
+		is_suspicious_process_thread_present,
 		trigger_patchguard_bugcheck
 	};
 
@@ -36,6 +42,7 @@ namespace communication
 		union
 		{
 			s_protected_processes protected_processes = { };
+			s_is_suspicious_process_thread_present is_suspicious_process_thread_present;
 		};
 	};
 }

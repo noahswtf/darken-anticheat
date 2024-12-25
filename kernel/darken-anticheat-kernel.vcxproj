@@ -152,6 +152,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\offsets\offsets.cpp" />
     <ClCompile Include="src\patchguard\patchguard.cpp" />
+    <ClCompile Include="src\process\process_thread.cpp" />
     <ClCompile Include="src\system\system_thread.cpp" />
     <ClCompile Include="src\utilities\ntkrnl.cpp" />
   </ItemGroup>
@@ -160,8 +161,13 @@
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\offsets\offsets.h" />
     <ClInclude Include="src\patchguard\patchguard.h" />
+    <ClInclude Include="src\process\process_thread.h" />
     <ClInclude Include="src\shared_data\shared_data.h" />
     <ClInclude Include="src\structures\kldr_data_table_entry.h" />
+    <ClInclude Include="src\structures\ldr_data_table_entry.h" />
+    <ClInclude Include="src\structures\ldr_dll_load_reason.h" />
+    <ClInclude Include="src\structures\peb_ldr_data.h" />
+    <ClInclude Include="src\structures\_peb.h" />
     <ClInclude Include="src\system\system_thread.h" />
     <ClInclude Include="src\utilities\ntkrnl.h" />
   </ItemGroup>

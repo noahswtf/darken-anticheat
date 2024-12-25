@@ -51,6 +51,9 @@
     <ClCompile Include="..\user-shared\detections\patchguard\patchguard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\user-shared\detections\process\process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\log\log.h">

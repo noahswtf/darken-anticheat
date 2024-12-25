@@ -1,5 +1,6 @@
 #include "handles/permission_stripping.h"
 #include "system/system_thread.h"
+#include "process/process_thread.h"
 #include "shared_data/shared_data.h"
 #include "patchguard/patchguard.h"
 #include "utilities/ntkrnl.h"
@@ -67,6 +68,12 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 		break;
 	}
+	case d_control_code(communication::e_control_code::is_suspicious_process_thread_present):
+	{
+		call_info->detection_status = process::process_thread::is_suspicious_thread_present(call_info->is_suspicious_process_thread_present);
+
+		break;
+	}
 	case d_control_code(communication::e_control_code::trigger_patchguard_bugcheck):
 	{
 		patchguard::trigger_bugcheck();
@@ -117,9 +124,21 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 		return STATUS_ABANDONED;
 	}
 
-	IoCreateSymbolicLink(&driver_info::device_symbolic_name, &driver_info::device_name);
+	driver_object->MajorFunction[IRP_MJ_CREATE] = ioctl_manage_call;
+	driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
+	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
+	driver_object->DriverUnload = driver_unload;
 
-	NTSTATUS sanity_status = IoCreateDevice(driver_object, 0, &driver_info::device_name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &driver_object->DeviceObject);
+	NTSTATUS sanity_status = IoCreateSymbolicLink(&driver_info::device_symbolic_name, &driver_info::device_name);
+
+	if (NT_SUCCESS(sanity_status) == false)
+	{
+		d_log("[darken-anticheat] unable to create symbolic link between device names.\n");
+
+		return sanity_status;
+	}
+
+	sanity_status = IoCreateDevice(driver_object, 0, &driver_info::device_name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &driver_object->DeviceObject);
 
 	if (NT_SUCCESS(sanity_status) == false)
 	{
@@ -127,11 +146,6 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 
 		return sanity_status;
 	}
-
-	driver_object->MajorFunction[IRP_MJ_CREATE] = ioctl_manage_call;
-	driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
-	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
-	driver_object->DriverUnload = driver_unload;
 
 	// NOTE: if you are testing on a system with patchguard disabled, uncommenting this next line WILL crash your system
 	//patchguard::trigger_bugcheck(); // im not sure about this line yet, control over the idt could lead them straight to this routine

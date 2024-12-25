@@ -52,7 +52,13 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 
 		// they can just remove it from pspcid table
 		// and we won't be able to find their thread by these means anymore
+		// todo: iterate system process thread linked list (can also be unlinked from)
 		if (NT_SUCCESS(PsLookupThreadByThreadId(reinterpret_cast<void*>(current_thread_id), reinterpret_cast<PETHREAD*>(&current_ethread))) == false)
+		{
+			continue;
+		}
+
+		if (PsIsSystemThread(reinterpret_cast<PETHREAD>(current_ethread)) == false)
 		{
 			continue;
 		}
@@ -65,6 +71,18 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 		}
 
 		uint64_t current_ethread_process_id = ntkrnl::get_process_id(current_ethread_process);
+
+		if (current_ethread_process_id != shared_data::protected_processes.anticheat_usermode_id && current_ethread_process_id != shared_data::protected_processes.protected_process_id)
+		{
+			// will detect KeStackAttachProcess and hence MmCopyVirtualMemory
+			if (is_thread_attached_to_process(current_ethread, shared_data::protected_processes.anticheat_usermode_id) == true
+				|| is_thread_attached_to_process(current_ethread, shared_data::protected_processes.protected_process_id) == true)
+			{
+				d_log("[darken-anticheat] thread id: %llx was attached to a protected process.\n", current_thread_id);
+
+				return communication::e_detection_status::flagged;
+			}
+		}
 
 		if (current_ethread_process_id != 4)
 		{
@@ -97,15 +115,6 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 		if (enumerate_system_modules_callback_context != 1337)
 		{
 			d_log("[darken-anticheat] thread id: %llx has a Win32StartAddress (0x%llx) which resides outside of a valid kernel module.\n", current_thread_id, current_thread_win32_start_address);
-
-			return communication::e_detection_status::flagged;
-		}
-
-		// will detect KeStackAttachProcess and hence MmCopyVirtualMemory
-		if (is_thread_attached_to_process(current_ethread, shared_data::protected_processes.anticheat_usermode_id) == true
-			|| is_thread_attached_to_process(current_ethread, shared_data::protected_processes.protected_process_id) == true)
-		{
-			d_log("[darken-anticheat] thread id: %llx was attached to a protected process.\n", current_thread_id);
 
 			return communication::e_detection_status::flagged;
 		}
