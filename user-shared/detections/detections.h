@@ -4,6 +4,7 @@
 #define _detections_include_guard
 #include "anti_debug/anti_debug.h"
 #include "patchguard/patchguard.h"
+#include "hypervisor/hypervisor.h"
 #include "process/process.h"
 #include "threads/threads.h"
 #include "modules/modules.h"

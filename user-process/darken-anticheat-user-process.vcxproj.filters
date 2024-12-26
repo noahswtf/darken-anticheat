@@ -54,6 +54,9 @@
     <ClCompile Include="..\user-shared\detections\process\process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\user-shared\detections\hypervisor\hypervisor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\log\log.h">

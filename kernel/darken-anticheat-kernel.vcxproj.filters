@@ -45,6 +45,9 @@
     <ClCompile Include="src\process\process_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\hypervisor\reserved_msr_usage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\handles\permission_stripping.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\structures\ldr_dll_load_reason.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hypervisor\reserved_msr_usage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

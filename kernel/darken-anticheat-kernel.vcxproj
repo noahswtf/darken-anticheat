@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\handles\permission_stripping.cpp" />
+    <ClCompile Include="src\hypervisor\reserved_msr_usage.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\offsets\offsets.cpp" />
     <ClCompile Include="src\patchguard\patchguard.cpp" />
@@ -158,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\handles\permission_stripping.h" />
+    <ClInclude Include="src\hypervisor\reserved_msr_usage.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\offsets\offsets.h" />
     <ClInclude Include="src\patchguard\patchguard.h" />

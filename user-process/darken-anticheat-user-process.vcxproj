@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\user-shared\detections\anti_debug\anti_debug.cpp" />
+    <ClCompile Include="..\user-shared\detections\hypervisor\hypervisor.cpp" />
     <ClCompile Include="..\user-shared\detections\modules\modules.cpp" />
     <ClCompile Include="..\user-shared\detections\patchguard\patchguard.cpp" />
     <ClCompile Include="..\user-shared\detections\process\process.cpp" />

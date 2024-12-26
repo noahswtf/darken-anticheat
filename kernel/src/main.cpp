@@ -1,4 +1,5 @@
 #include "handles/permission_stripping.h"
+#include "hypervisor/reserved_msr_usage.h"
 #include "system/system_thread.h"
 #include "process/process_thread.h"
 #include "shared_data/shared_data.h"
@@ -71,6 +72,12 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 	case d_control_code(communication::e_control_code::is_suspicious_process_thread_present):
 	{
 		call_info->detection_status = process::process_thread::is_suspicious_thread_present(call_info->is_suspicious_process_thread_present);
+
+		break;
+	}
+	case d_control_code(communication::e_control_code::check_reserved_msr_usage):
+	{
+		call_info->detection_status = hypervisor::check_reserved_msr_usage();
 
 		break;
 	}
