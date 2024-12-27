@@ -18,7 +18,7 @@ communication::e_detection_status hypervisor::check_reserved_msr_usage()
 			__readmsr(i);
 
 			// should ever not get here if msr read throws exception
-			d_log("[darken-anticheat] found usage of reserved MSR (index: %x).\n", i);
+			d_log("[darken-anticheat] found usage of reserved MSR (index: 0x%x).\n", i);
 
 			return communication::e_detection_status::flagged;
 		}
