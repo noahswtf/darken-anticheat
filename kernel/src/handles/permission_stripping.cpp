@@ -1,5 +1,5 @@
 #include "permission_stripping.h"
-#include "../shared_data/shared_data.h"
+#include "../context/context.h"
 #include "../log.h"
 #include <ntifs.h>
 
@@ -64,6 +64,8 @@ void post_operation_detour(void* registration_context, POB_POST_OPERATION_INFORM
 
 bool handles::permission_stripping::load()
 {
+	context::s_context* context = context::get_decrypted();
+
 	OB_OPERATION_REGISTRATION ob_operation_registration = { };
 
 	ob_operation_registration.ObjectType = PsProcessType;
@@ -74,7 +76,7 @@ bool handles::permission_stripping::load()
 	OB_CALLBACK_REGISTRATION callback_registration = { };
 
 	callback_registration.OperationRegistration = &ob_operation_registration;
-	callback_registration.RegistrationContext = &shared_data::protected_processes;
+	callback_registration.RegistrationContext = &context->protected_processes;
 	callback_registration.Version = OB_FLT_REGISTRATION_VERSION;
 	callback_registration.Altitude = RTL_CONSTANT_STRING(L"361337"); // 360000 - 389999: FSFilter Activity Monitor
 	callback_registration.OperationRegistrationCount = 1;

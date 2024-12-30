@@ -72,11 +72,11 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
-    <IncludePath>$(SolutionDir)global-shared;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)global-shared;$(ProjectDir)ext;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
-    <IncludePath>$(SolutionDir)global-shared;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)global-shared;$(ProjectDir)ext;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -101,6 +101,7 @@
     <Link>
       <EntryPointSymbol>driver_entry</EntryPointSymbol>
       <AdditionalOptions>/integritycheck %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -117,6 +118,7 @@
     <Link>
       <EntryPointSymbol>driver_entry</EntryPointSymbol>
       <AdditionalOptions>/integritycheck %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -148,8 +150,20 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ext\portable_executable\data_directory.cpp" />
+    <ClCompile Include="ext\portable_executable\dos_header.cpp" />
+    <ClCompile Include="ext\portable_executable\export_directory.cpp" />
+    <ClCompile Include="ext\portable_executable\image.cpp" />
+    <ClCompile Include="ext\portable_executable\imports_directory.cpp" />
+    <ClCompile Include="ext\portable_executable\nt_headers.cpp" />
+    <ClCompile Include="ext\portable_executable\pe_crt\crt_memory.cpp" />
+    <ClCompile Include="ext\portable_executable\pe_crt\crt_string.cpp" />
+    <ClCompile Include="ext\portable_executable\relocations_directory.cpp" />
+    <ClCompile Include="src\context\context.cpp" />
+    <ClCompile Include="src\crypto\crypto.cpp" />
     <ClCompile Include="src\handles\permission_stripping.cpp" />
     <ClCompile Include="src\hypervisor\reserved_msr_usage.cpp" />
+    <ClCompile Include="src\imports\imports.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\offsets\offsets.cpp" />
     <ClCompile Include="src\patchguard\patchguard.cpp" />
@@ -158,13 +172,30 @@
     <ClCompile Include="src\utilities\ntkrnl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ext\portable_executable\data_directory.hpp" />
+    <ClInclude Include="ext\portable_executable\dos_header.hpp" />
+    <ClInclude Include="ext\portable_executable\export_directory.hpp" />
+    <ClInclude Include="ext\portable_executable\file_header.hpp" />
+    <ClInclude Include="ext\portable_executable\image.hpp" />
+    <ClInclude Include="ext\portable_executable\imports_directory.hpp" />
+    <ClInclude Include="ext\portable_executable\nt_headers.hpp" />
+    <ClInclude Include="ext\portable_executable\optional_header.hpp" />
+    <ClInclude Include="ext\portable_executable\pe_crt\crt_memory.hpp" />
+    <ClInclude Include="ext\portable_executable\pe_crt\crt_string.hpp" />
+    <ClInclude Include="ext\portable_executable\pe_crt\crt_types.hpp" />
+    <ClInclude Include="ext\portable_executable\pe_crt\crt_type_traits.hpp" />
+    <ClInclude Include="ext\portable_executable\relocations_directory.hpp" />
+    <ClInclude Include="ext\portable_executable\section_header.hpp" />
+    <ClInclude Include="src\context\context.h" />
+    <ClInclude Include="src\crypto\crypto.h" />
     <ClInclude Include="src\handles\permission_stripping.h" />
     <ClInclude Include="src\hypervisor\reserved_msr_usage.h" />
+    <ClInclude Include="src\imports\imports.h" />
+    <ClInclude Include="src\imports\imports_def.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\offsets\offsets.h" />
     <ClInclude Include="src\patchguard\patchguard.h" />
     <ClInclude Include="src\process\process_thread.h" />
-    <ClInclude Include="src\shared_data\shared_data.h" />
     <ClInclude Include="src\structures\kldr_data_table_entry.h" />
     <ClInclude Include="src\structures\ldr_data_table_entry.h" />
     <ClInclude Include="src\structures\ldr_dll_load_reason.h" />

@@ -1,15 +1,17 @@
 #include "offsets.h"
+#include "../context/context.h"
 #include <ntifs.h>
-
-extern "C" uint32_t* NtBuildNumber;
 
 bool offsets::load()
 {
-	uint16_t build_number = *reinterpret_cast<uint16_t*>(NtBuildNumber);
+	context::s_context* context = context::get_decrypted();
+
+	uint16_t build_number = *context->imports.nt_build_number;
 
 	if (26100 <= build_number) // windows 11 24h2 +
 	{
 		eprocess::unique_process_id = 0x1D0;
+		eprocess::section_base_address = 0x2B0;
 
 		ethread::start_address = 0x4E0;
 		ethread::win32_start_address = 0x560;
@@ -17,6 +19,7 @@ bool offsets::load()
 	else if (22000 <= build_number) // Windows 11 Insider Preview -> Windows 11 23H2
 	{
 		eprocess::unique_process_id = 0x440;
+		eprocess::section_base_address = 0x520;
 
 		ethread::start_address = 0x4A0;
 		ethread::win32_start_address = 0x520;
@@ -24,6 +27,7 @@ bool offsets::load()
 	else if (19041 <= build_number) // Windows 10 2004 -> Windows 10 22H2
 	{
 		eprocess::unique_process_id = 0x440;
+		eprocess::section_base_address = 0x520;
 
 		ethread::start_address = 0x450;
 		ethread::win32_start_address = 0x4D0;
@@ -31,6 +35,7 @@ bool offsets::load()
 	else if (18362 <= build_number) // Windows 10 1903 -> Windows 10 1909
 	{
 		eprocess::unique_process_id = 0x2E0;
+		eprocess::section_base_address = 0x3C8;
 
 		ethread::start_address = 0x620;
 		ethread::win32_start_address = 0x6A0;

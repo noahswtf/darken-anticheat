@@ -12,5 +12,8 @@ Open source solution for protecting your software against tampering and reverse 
 - Causing bugcheck if PatchGuard (KPP) is disabled / has an invalid context.
 - Checking usage of reserved MSRs (model specific registers).
 
+# Credits
+- [papstuc](https://github.com/papstuc) for the [nocrt portable executable library used](https://github.com/papstuc/nocrt_portable_executable).
+
 # Licensing
 This project has been placed under the [GNU General Public License](LICENSE), if there are any specific enquiries regarding usage, please contact the founder of the project (noahswtf).

@@ -1,5 +1,5 @@
 #include "system_thread.h"
-#include "../shared_data/shared_data.h"
+#include "../context/context.h"
 #include "../utilities/ntkrnl.h"
 #include "../offsets/offsets.h"
 #include "../structures/kldr_data_table_entry.h"
@@ -40,6 +40,8 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 {
 	uint64_t our_executing_thread = ntkrnl::get_current_thread();
 
+	context::s_context* context = context::get_decrypted();
+
 	// todo: enumerate pspcid table to find threads 'manually'
 	// with my testing on Windows 11 24H2, thread ids go past 0x3000 boundary
 	// i believe that 0x4000 is the limit but feel free to make a change if its not
@@ -72,11 +74,11 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 
 		uint64_t current_ethread_process_id = ntkrnl::get_process_id(current_ethread_process);
 
-		if (current_ethread_process_id != shared_data::protected_processes.anticheat_usermode_id && current_ethread_process_id != shared_data::protected_processes.protected_process_id)
+		if (current_ethread_process_id != context->protected_processes.anticheat_usermode_id && current_ethread_process_id != context->protected_processes.protected_process_id)
 		{
 			// will detect KeStackAttachProcess and hence MmCopyVirtualMemory
-			if (is_thread_attached_to_process(current_ethread, shared_data::protected_processes.anticheat_usermode_id) == true
-				|| is_thread_attached_to_process(current_ethread, shared_data::protected_processes.protected_process_id) == true)
+			if (is_thread_attached_to_process(current_ethread, context->protected_processes.anticheat_usermode_id) == true
+				|| is_thread_attached_to_process(current_ethread, context->protected_processes.protected_process_id) == true)
 			{
 				d_log("[darken-anticheat] thread id: %llx was attached to a protected process.\n", current_thread_id);
 
