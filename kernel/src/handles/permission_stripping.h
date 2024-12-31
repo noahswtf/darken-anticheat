@@ -1,11 +1,11 @@
 #pragma once
-#include <communication_types.h>
+#include "../context/context.h"
 
 namespace handles
 {
 	namespace permission_stripping
 	{
-		bool load();
+		bool load(context::s_context* context);
 		void unload();
 	}
 }

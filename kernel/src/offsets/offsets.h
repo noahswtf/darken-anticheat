@@ -1,5 +1,5 @@
 #pragma once
-#include <generic_types.h>
+#include "../context/context.h"
 
 // when people reverse engineer our driver, they are going to grab a hypervisor
 // and place breakpoints on nearly every export in ntoskrnl
@@ -11,7 +11,7 @@
 // starts at Windows 10 1507 up until Windows 11 24H2
 namespace offsets
 {
-	bool load();
+	bool load(context::s_context* context);
 
 	namespace kthread
 	{

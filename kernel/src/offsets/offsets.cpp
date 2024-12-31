@@ -2,10 +2,8 @@
 #include "../context/context.h"
 #include <ntifs.h>
 
-bool offsets::load()
+bool offsets::load(context::s_context* context)
 {
-	context::s_context* context = context::get_decrypted();
-
 	uint16_t build_number = *context->imports.nt_build_number;
 
 	if (26100 <= build_number) // windows 11 24h2 +

@@ -36,11 +36,9 @@ bool is_thread_attached_to_process(uint64_t ethread, uint64_t eprocess)
 #pragma warning(push)
 #pragma warning(disable: 6387) // for some reason msvc is throwing a warning that current_thread_id could be 0, even when i added a check before executing PsLookupThreadByThreadId
 
-communication::e_detection_status system::system_thread::is_suspicious_thread_present()
+communication::e_detection_status system::system_thread::is_suspicious_thread_present(context::s_context* context)
 {
 	uint64_t our_executing_thread = ntkrnl::get_current_thread();
-
-	context::s_context* context = context::get_decrypted();
 
 	// todo: enumerate pspcid table to find threads 'manually'
 	// with my testing on Windows 11 24H2, thread ids go past 0x3000 boundary
@@ -55,12 +53,12 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 		// they can just remove it from pspcid table
 		// and we won't be able to find their thread by these means anymore
 		// todo: iterate system process thread linked list (can also be unlinked from)
-		if (NT_SUCCESS(PsLookupThreadByThreadId(reinterpret_cast<void*>(current_thread_id), reinterpret_cast<PETHREAD*>(&current_ethread))) == false)
+		if (NT_SUCCESS(context->imports.ps_lookup_thread_by_thread_id(current_thread_id, &current_ethread)) == false)
 		{
 			continue;
 		}
 
-		if (PsIsSystemThread(reinterpret_cast<PETHREAD>(current_ethread)) == false)
+		if (context->imports.ps_is_system_thread(current_ethread) == false)
 		{
 			continue;
 		}
@@ -111,7 +109,7 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 
 		uint64_t enumerate_system_modules_callback_context = current_thread_win32_start_address;
 
-		ntkrnl::enumerate_system_modules(check_thread_address_in_module_callback, &enumerate_system_modules_callback_context);
+		ntkrnl::enumerate_system_modules(context, check_thread_address_in_module_callback, &enumerate_system_modules_callback_context);
 
 		// will be set to 1337 if in a legimate module
 		if (enumerate_system_modules_callback_context != 1337)

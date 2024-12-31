@@ -43,7 +43,7 @@ int main()
 		// then uncommenting next line will cause a system crash
 		//d_check_detection(detections::patchguard::trigger_bugcheck);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 
 	driver::unload();

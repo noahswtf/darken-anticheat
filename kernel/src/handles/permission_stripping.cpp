@@ -59,13 +59,11 @@ void post_operation_detour(void* registration_context, POB_POST_OPERATION_INFORM
 	UNREFERENCED_PARAMETER(operation_information);
 }
 
-bool handles::permission_stripping::load()
+bool handles::permission_stripping::load(context::s_context* context)
 {
-	context::s_context* context = context::get_decrypted();
-
 	OB_OPERATION_REGISTRATION ob_operation_registration = { };
 
-	ob_operation_registration.ObjectType = PsProcessType;
+	ob_operation_registration.ObjectType = reinterpret_cast<POBJECT_TYPE*>(context->imports.ps_process_type);
 	ob_operation_registration.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
 	ob_operation_registration.PreOperation = reinterpret_cast<POB_PRE_OPERATION_CALLBACK>(pre_operation_detour);
 	ob_operation_registration.PostOperation = post_operation_detour;
@@ -85,7 +83,9 @@ void handles::permission_stripping::unload()
 {
 	if (callback_handle != nullptr)
 	{
-		ObUnRegisterCallbacks(callback_handle);
+		context::s_context* context = context::get_decrypted();
+
+		context->imports.ob_unregister_callbacks(callback_handle);
 
 		callback_handle = nullptr;
 	}

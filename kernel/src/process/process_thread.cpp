@@ -14,7 +14,7 @@ extern "C" NTKERNELAPI PPEB PsGetProcessPeb(PEPROCESS);
 
 #define print( format, ... ) DbgPrintEx( DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, format, __VA_ARGS__ )
 
-communication::e_detection_status process::process_thread::is_suspicious_thread_present(communication::s_is_suspicious_process_thread_present is_suspicious_process_thread_present)
+communication::e_detection_status process::process_thread::is_suspicious_thread_present(context::s_context* context, communication::s_is_suspicious_process_thread_present is_suspicious_process_thread_present)
 {
 	if (is_suspicious_process_thread_present.process_id == 0)
 	{
@@ -31,16 +31,16 @@ communication::e_detection_status process::process_thread::is_suspicious_thread_
 	KAPC_STATE apc_state = { };
 
 	// todo: implement our own 'attaching' by directly reading memory of process
-	KeStackAttachProcess(reinterpret_cast<PRKPROCESS>(protected_eprocess), &apc_state);
+	context->imports.ke_stack_attach_process(protected_eprocess, &apc_state);
 
-	PPEB protected_process_peb = PsGetProcessPeb(reinterpret_cast<PEPROCESS>(protected_eprocess));
+	PPEB protected_process_peb = reinterpret_cast<PPEB>(context->imports.ps_get_process_peb(protected_eprocess));
 
 	// todo: walk page tables ourselves to check if translation succeeds, not using MmIsAddressValid
-	if (protected_process_peb == nullptr || MmIsAddressValid(protected_process_peb) == false)
+	if (protected_process_peb == nullptr || context->imports.mm_is_address_valid(reinterpret_cast<uint64_t>(protected_process_peb)) == false)
 	{
 		d_log("[darken-anticheat][process::process_thread::is_suspicious_thread_present] unable to get peb of protected process with id: 0x%llx.\n", is_suspicious_process_thread_present.process_id);
 
-		KeUnstackDetachProcess(&apc_state);
+		context->imports.ke_unstack_detach_process(&apc_state);
 
 		return communication::e_detection_status::runtime_error;
 	}
@@ -52,12 +52,12 @@ communication::e_detection_status process::process_thread::is_suspicious_thread_
 	{
 		uint64_t current_ethread = 0;
 
-		if (NT_SUCCESS(PsLookupThreadByThreadId(reinterpret_cast<void*>(current_thread_id), reinterpret_cast<PETHREAD*>(&current_ethread))) == false)
+		if (NT_SUCCESS(context->imports.ps_lookup_thread_by_thread_id(current_thread_id, &current_ethread)) == false)
 		{
 			continue;
 		}
 
-		if (our_executing_thread == current_ethread || PsIsSystemThread(reinterpret_cast<PETHREAD>(current_ethread)) == 1)
+		if (our_executing_thread == current_ethread || context->imports.ps_is_system_thread(current_ethread) == 1)
 		{
 			continue;
 		}
@@ -103,13 +103,13 @@ communication::e_detection_status process::process_thread::is_suspicious_thread_
 		{
 			d_log("[darken-anticheat] thread id: %llx has a Win32StartAddress (0x%llx) which resides outside of a valid module of process with id: %llx.\n", current_thread_id, current_thread_win32_start_address, is_suspicious_process_thread_present.process_id);
 
-			KeUnstackDetachProcess(&apc_state);
+			context->imports.ke_unstack_detach_process(&apc_state);
 
 			return communication::e_detection_status::flagged;
 		}
 	}
 
-	KeUnstackDetachProcess(&apc_state);
+	context->imports.ke_unstack_detach_process(&apc_state);
 
 	return communication::e_detection_status::clean;
 }

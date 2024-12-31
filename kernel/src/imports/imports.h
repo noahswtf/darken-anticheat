@@ -1,7 +1,7 @@
 #pragma once
-#include "imports_def.h"
+#include "../context/context.h"
 
 namespace imports
 {
-	bool load();
+	bool load(context::s_context* context);
 }

@@ -33,6 +33,7 @@ bool context::load()
 		return false;
 	}
 
+	context->imports.ex_allocate_pool_2 = ex_allocate_pool_2;
 	context->ntoskrnl_base_address = ntoskrnl_base_address;
 	context->initial_system_process = ntkrnl::get_current_process(); // will be the initial system process on driver entry
 
@@ -48,9 +49,9 @@ void context::unload()
 		return;
 	}
 
-	void* context = get_decrypted();
+	context::s_context* context = get_decrypted();
 
-	ExFreePoolWithTag(context, 'drac');
+	context->imports.ex_free_pool_with_tag(reinterpret_cast<uint64_t>(context), 'drac');
 
 	encrypted_context_pointer = 0;
 }

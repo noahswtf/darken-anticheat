@@ -26,7 +26,9 @@ NTSTATUS ioctl_manage_call(PDEVICE_OBJECT device_object, PIRP irp)
 	irp->IoStatus.Information = 0ull;
 	irp->IoStatus.Status = STATUS_SUCCESS;
 
-	IofCompleteRequest(irp, IO_NO_INCREMENT);
+	context::s_context* context = context::get_decrypted();
+
+	context->imports.iof_complete_request(irp, IO_NO_INCREMENT);
 
 	return STATUS_SUCCESS;
 }
@@ -35,11 +37,12 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 {
 	UNREFERENCED_PARAMETER(device_object);
 
+	context::s_context* context = context::get_decrypted();
+
+	// IoGetCurrentIrpStackLocation is force inlined
 	uint32_t code = IoGetCurrentIrpStackLocation(irp)->Parameters.DeviceIoControl.IoControlCode;
 
 	communication::s_call_info* call_info = reinterpret_cast<communication::s_call_info*>(irp->AssociatedIrp.SystemBuffer);
-
-	context::s_context* context = context::get_decrypted();
 
 	switch (code)
 	{
@@ -68,13 +71,13 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 	}
 	case d_control_code(communication::e_control_code::is_suspicious_system_thread_present):
 	{
-		call_info->detection_status = system::system_thread::is_suspicious_thread_present();
+		call_info->detection_status = system::system_thread::is_suspicious_thread_present(context);
 
 		break;
 	}
 	case d_control_code(communication::e_control_code::is_suspicious_process_thread_present):
 	{
-		call_info->detection_status = process::process_thread::is_suspicious_thread_present(call_info->is_suspicious_process_thread_present);
+		call_info->detection_status = process::process_thread::is_suspicious_thread_present(context, call_info->is_suspicious_process_thread_present);
 
 		break;
 	}
@@ -110,11 +113,18 @@ NTSTATUS ioctl_call_processor(PDEVICE_OBJECT device_object, PIRP irp)
 
 void driver_unload(PDRIVER_OBJECT driver_object)
 {
+	context::s_context* context = context::get_decrypted();
+
+	t_io_delete_device io_delete_device = context->imports.io_delete_device;
+	t_io_delete_symbolic_link io_delete_symbolic_link = context->imports.io_delete_symbolic_link;
+
+	context = nullptr;
+
 	handles::permission_stripping::unload();
 	context::unload();
 
-	IoDeleteDevice(driver_object->DeviceObject);
-	IoDeleteSymbolicLink(&driver_info::device_symbolic_name);
+	io_delete_device(driver_object->DeviceObject);
+	io_delete_symbolic_link(&driver_info::device_symbolic_name);
 }
 
 NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_path)
@@ -126,19 +136,21 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 		return STATUS_ABANDONED;
 	}
 
-	if (imports::load() == false)
+	context::s_context* context = context::get_decrypted();
+
+	if (imports::load(context) == false)
 	{
 		return STATUS_ABANDONED;
 	}
 
-	if (offsets::load() == false)
+	if (offsets::load(context) == false)
 	{
 		d_log("[darken-anticheat] failed to calculate offsets, are we on an unsupported Windows version?\n");
 
 		return STATUS_ABANDONED;
 	}
 
-	if (handles::permission_stripping::load() == false)
+	if (handles::permission_stripping::load(context) == false)
 	{
 		d_log("[darken-anticheat] failed to load process handle permission stripping.\n");
 
@@ -150,7 +162,7 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
 	driver_object->DriverUnload = driver_unload;
 
-	NTSTATUS sanity_status = IoCreateSymbolicLink(&driver_info::device_symbolic_name, &driver_info::device_name);
+	NTSTATUS sanity_status = context->imports.io_create_symbolic_link(&driver_info::device_symbolic_name, &driver_info::device_name);
 
 	if (NT_SUCCESS(sanity_status) == false)
 	{
@@ -159,7 +171,7 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 		return sanity_status;
 	}
 
-	sanity_status = IoCreateDevice(driver_object, 0, &driver_info::device_name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &driver_object->DeviceObject);
+	sanity_status = context->imports.io_create_device(driver_object, 0, &driver_info::device_name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &driver_object->DeviceObject);
 
 	if (NT_SUCCESS(sanity_status) == false)
 	{

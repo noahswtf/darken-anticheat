@@ -8,8 +8,6 @@
 
 #define d_lstar_msr 0xC0000082
 
-extern "C" PLIST_ENTRY PsLoadedModuleList;
-
 uint64_t ntkrnl::get_eprocess(uint64_t target_process_id)
 {
 	context::s_context* context = context::get_decrypted();
@@ -72,13 +70,15 @@ uint64_t ntkrnl::get_current_thread()
 	return __readgsqword(0x188);
 }
 
-void ntkrnl::enumerate_system_modules(t_enumerate_modules_callback callback, void* context)
+void ntkrnl::enumerate_system_modules(context::s_context* context, t_enumerate_modules_callback callback, void* ctx)
 {
-	for (PLIST_ENTRY current_list_entry = PsLoadedModuleList->Flink; current_list_entry != PsLoadedModuleList; current_list_entry = current_list_entry->Flink)
+	PLIST_ENTRY ps_loaded_module_list = reinterpret_cast<PLIST_ENTRY>(context->imports.ps_loaded_module_list);
+
+	for (PLIST_ENTRY current_list_entry = ps_loaded_module_list->Flink; current_list_entry != ps_loaded_module_list; current_list_entry = current_list_entry->Flink)
 	{
 		_KLDR_DATA_TABLE_ENTRY* current_module_info = CONTAINING_RECORD(current_list_entry, _KLDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
 
-		if (callback(reinterpret_cast<uint64_t>(current_module_info), context) == true)
+		if (callback(reinterpret_cast<uint64_t>(current_module_info), ctx) == true)
 		{
 			return;
 		}
