@@ -27,10 +27,10 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\handles\permission_stripping.cpp">
+    <ClCompile Include="src\detections\handles\permission_stripping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\system\system_thread.cpp">
+    <ClCompile Include="src\detections\system\system_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\ntkrnl.cpp">
@@ -39,13 +39,13 @@
     <ClCompile Include="src\offsets\offsets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\patchguard\patchguard.cpp">
+    <ClCompile Include="src\detections\patchguard\patchguard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\process\process_thread.cpp">
+    <ClCompile Include="src\detections\process\process_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\hypervisor\reserved_msr_usage.cpp">
+    <ClCompile Include="src\detections\hypervisor\reserved_msr_usage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ext\portable_executable\pe_crt\crt_memory.cpp">
@@ -86,13 +86,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\handles\permission_stripping.h">
+    <ClInclude Include="src\detections\handles\permission_stripping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\system\system_thread.h">
+    <ClInclude Include="src\detections\system\system_thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\ntkrnl.h">
@@ -104,10 +104,10 @@
     <ClInclude Include="src\structures\kldr_data_table_entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\patchguard\patchguard.h">
+    <ClInclude Include="src\detections\patchguard\patchguard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\process\process_thread.h">
+    <ClInclude Include="src\detections\process\process_thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\structures\_peb.h">
@@ -122,7 +122,7 @@
     <ClInclude Include="src\structures\ldr_dll_load_reason.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\hypervisor\reserved_msr_usage.h">
+    <ClInclude Include="src\detections\hypervisor\reserved_msr_usage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ext\portable_executable\pe_crt\crt_memory.hpp">
@@ -181,7 +181,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\patchguard\patchguard_assembler.asm">
+    <MASM Include="src\detections\patchguard\patchguard_assembler.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

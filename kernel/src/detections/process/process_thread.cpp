@@ -1,10 +1,10 @@
 #include "process_thread.h"
-#include "../utilities/ntkrnl.h"
-#include "../offsets/offsets.h"
-#include "../log.h"
+#include "../../utilities/ntkrnl.h"
+#include "../../offsets/offsets.h"
+#include "../../log.h"
 
-#include "../structures/ldr_data_table_entry.h"
-#include "../structures/_peb.h"
+#include "../../structures/ldr_data_table_entry.h"
+#include "../../structures/_peb.h"
 #include <ntifs.h>
 
 extern "C" NTKERNELAPI PPEB PsGetProcessPeb(PEPROCESS);

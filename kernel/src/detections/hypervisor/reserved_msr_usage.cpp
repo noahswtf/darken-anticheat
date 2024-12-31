@@ -1,7 +1,5 @@
 #include "reserved_msr_usage.h"
-#include "../utilities/ntkrnl.h"
-#include "../offsets/offsets.h"
-#include "../log.h"
+#include "../../log.h"
 
 #include <ntifs.h>
 #include <intrin.h>

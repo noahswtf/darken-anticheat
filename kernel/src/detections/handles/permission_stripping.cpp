@@ -1,7 +1,7 @@
 #include "permission_stripping.h"
-#include "../utilities/ntkrnl.h"
-#include "../context/context.h"
-#include "../log.h"
+#include "../../utilities/ntkrnl.h"
+#include "../../context/context.h"
+#include "../../log.h"
 #include <ntifs.h>
 
 namespace handles

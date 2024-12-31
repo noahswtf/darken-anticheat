@@ -1,9 +1,9 @@
 #include "system_thread.h"
-#include "../context/context.h"
-#include "../utilities/ntkrnl.h"
-#include "../offsets/offsets.h"
-#include "../structures/kldr_data_table_entry.h"
-#include "../log.h"
+#include "../../context/context.h"
+#include "../../utilities/ntkrnl.h"
+#include "../../offsets/offsets.h"
+#include "../../structures/kldr_data_table_entry.h"
+#include "../../log.h"
 
 #include <ntifs.h>
 

@@ -161,14 +161,14 @@
     <ClCompile Include="ext\portable_executable\relocations_directory.cpp" />
     <ClCompile Include="src\context\context.cpp" />
     <ClCompile Include="src\crypto\crypto.cpp" />
-    <ClCompile Include="src\handles\permission_stripping.cpp" />
-    <ClCompile Include="src\hypervisor\reserved_msr_usage.cpp" />
+    <ClCompile Include="src\detections\handles\permission_stripping.cpp" />
+    <ClCompile Include="src\detections\hypervisor\reserved_msr_usage.cpp" />
     <ClCompile Include="src\imports\imports.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\offsets\offsets.cpp" />
-    <ClCompile Include="src\patchguard\patchguard.cpp" />
-    <ClCompile Include="src\process\process_thread.cpp" />
-    <ClCompile Include="src\system\system_thread.cpp" />
+    <ClCompile Include="src\detections\patchguard\patchguard.cpp" />
+    <ClCompile Include="src\detections\process\process_thread.cpp" />
+    <ClCompile Include="src\detections\system\system_thread.cpp" />
     <ClCompile Include="src\utilities\ntkrnl.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -188,24 +188,24 @@
     <ClInclude Include="ext\portable_executable\section_header.hpp" />
     <ClInclude Include="src\context\context.h" />
     <ClInclude Include="src\crypto\crypto.h" />
-    <ClInclude Include="src\handles\permission_stripping.h" />
-    <ClInclude Include="src\hypervisor\reserved_msr_usage.h" />
+    <ClInclude Include="src\detections\handles\permission_stripping.h" />
+    <ClInclude Include="src\detections\hypervisor\reserved_msr_usage.h" />
     <ClInclude Include="src\imports\imports.h" />
     <ClInclude Include="src\imports\imports_def.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\offsets\offsets.h" />
-    <ClInclude Include="src\patchguard\patchguard.h" />
-    <ClInclude Include="src\process\process_thread.h" />
+    <ClInclude Include="src\detections\patchguard\patchguard.h" />
+    <ClInclude Include="src\detections\process\process_thread.h" />
     <ClInclude Include="src\structures\kldr_data_table_entry.h" />
     <ClInclude Include="src\structures\ldr_data_table_entry.h" />
     <ClInclude Include="src\structures\ldr_dll_load_reason.h" />
     <ClInclude Include="src\structures\peb_ldr_data.h" />
     <ClInclude Include="src\structures\_peb.h" />
-    <ClInclude Include="src\system\system_thread.h" />
+    <ClInclude Include="src\detections\system\system_thread.h" />
     <ClInclude Include="src\utilities\ntkrnl.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\patchguard\patchguard_assembler.asm" />
+    <MASM Include="src\detections\patchguard\patchguard_assembler.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
