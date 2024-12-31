@@ -10,14 +10,7 @@
 // this function must be heavily virtualized in production
 bool context::load()
 {
-	uint64_t initial_system_process = ntkrnl::pre_initialization::find_initial_system_process();
-
-	if (initial_system_process == 0)
-	{
-		return false;
-	}
-
-	uint64_t ntoskrnl_base_address = ntkrnl::get_process_base_address(initial_system_process);
+	uint64_t ntoskrnl_base_address = ntkrnl::pre_initialization::find_ntoskrnl_base();
 
 	if (ntoskrnl_base_address == 0)
 	{
@@ -40,7 +33,8 @@ bool context::load()
 		return false;
 	}
 
-	context->initial_system_process = initial_system_process;
+	context->ntoskrnl_base_address = ntoskrnl_base_address;
+	context->initial_system_process = ntkrnl::get_current_process(); // will be the initial system process on driver entry
 
 	encrypted_context_pointer = crypto::xor64(reinterpret_cast<uint64_t>(context), d_context_xor_key);
 

@@ -5,6 +5,7 @@
 #include "context/context.h"
 #include "patchguard/patchguard.h"
 #include "utilities/ntkrnl.h"
+#include "imports/imports.h"
 #include "offsets/offsets.h"
 #include "log.h"
 
@@ -121,6 +122,11 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 	UNREFERENCED_PARAMETER(registry_path);
 
 	if (context::load() == false)
+	{
+		return STATUS_ABANDONED;
+	}
+
+	if (imports::load() == false)
 	{
 		return STATUS_ABANDONED;
 	}

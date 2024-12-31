@@ -1,5 +1,4 @@
 #include "reserved_msr_usage.h"
-#include "../shared_data/shared_data.h"
 #include "../utilities/ntkrnl.h"
 #include "../offsets/offsets.h"
 #include "../log.h"

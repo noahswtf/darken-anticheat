@@ -1,4 +1,5 @@
 #include "permission_stripping.h"
+#include "../utilities/ntkrnl.h"
 #include "../context/context.h"
 #include "../log.h"
 #include <ntifs.h>
@@ -22,10 +23,10 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 		return OB_PREOP_SUCCESS;
 	}
 
-	PEPROCESS current_process = PsGetCurrentProcess();
-	PEPROCESS target_process = reinterpret_cast<PEPROCESS>(pre_operation_information->Object);
+	uint64_t current_process = ntkrnl::get_current_process();
+	uint64_t target_process = reinterpret_cast<uint64_t>(pre_operation_information->Object);
 
-	if (current_process == nullptr || target_process == nullptr) // undefined behaviour
+	if (current_process == 0 || target_process == 0) // undefined behaviour
 	{
 		return OB_PREOP_SUCCESS;
 	}
@@ -35,7 +36,7 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 		return OB_PREOP_SUCCESS;
 	}
 
-	uint64_t target_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(target_process));
+	uint64_t target_process_id = ntkrnl::get_process_id(target_process);
 
 	if (target_process_id == protected_processes->anticheat_usermode_id || target_process_id == protected_processes->protected_process_id)
 	{
@@ -46,11 +47,7 @@ OB_PREOP_CALLBACK_STATUS pre_operation_detour(communication::s_protected_process
 			pre_operation_information->Parameters->CreateHandleInformation.DesiredAccess = (SYNCHRONIZE | d_process_query_limited_information) :
 			pre_operation_information->Parameters->DuplicateHandleInformation.DesiredAccess = (SYNCHRONIZE | d_process_query_limited_information);
 	
-		uint64_t current_process_id = reinterpret_cast<uint64_t>(PsGetProcessId(current_process));
-
-		d_log("[darken-anticheat] blocked handle being opened to (process id: 0x%llx) from (process id: 0x%llx).\n", target_process_id, current_process_id);
-	
-		UNREFERENCED_PARAMETER(current_process_id);
+		d_log("[darken-anticheat] blocked handle being opened to (process id: 0x%llx) from (process id: 0x%llx).\n", target_process_id, ntkrnl::get_process_id(current_process));
 	}
 
 	return OB_PREOP_SUCCESS;
@@ -81,7 +78,7 @@ bool handles::permission_stripping::load()
 	callback_registration.Altitude = RTL_CONSTANT_STRING(L"361337"); // 360000 - 389999: FSFilter Activity Monitor
 	callback_registration.OperationRegistrationCount = 1;
 
-	return NT_SUCCESS(ObRegisterCallbacks(&callback_registration, &callback_handle));
+	return NT_SUCCESS(context->imports.ob_register_callbacks(&callback_registration, &callback_handle));
 }
 
 void handles::permission_stripping::unload()

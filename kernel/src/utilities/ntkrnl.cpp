@@ -4,6 +4,9 @@
 #include "../structures/kldr_data_table_entry.h"
 
 #include <ntifs.h>
+#include <intrin.h>
+
+#define d_lstar_msr 0xC0000082
 
 extern "C" PLIST_ENTRY PsLoadedModuleList;
 
@@ -82,14 +85,24 @@ void ntkrnl::enumerate_system_modules(t_enumerate_modules_callback callback, voi
 	}
 }
 
-uint64_t ntkrnl::pre_initialization::find_initial_system_process()
+uint64_t ntkrnl::pre_initialization::find_ntoskrnl_base()
 {
-	uint64_t current_process = get_current_process();
+	// thanks to papstuc for the idea of walking back from lstar msr
+	uint64_t ki_system_call_handler = __readmsr(d_lstar_msr);
 
-	if (current_process == 0)
+	// ntoskrnl is always aligned to 2mb where large pages is supported
+	// todo: check large page support
+
+	// todo: add some sanity check so we dont go too far down, should always be found though
+	for (uint64_t system_2mb_boundary = ki_system_call_handler & 0xFFFFFFFFFFE00000; system_2mb_boundary != 0; system_2mb_boundary -= 0x200000)
 	{
-		return 0;
+		uint16_t header_magic = *reinterpret_cast<uint16_t*>(system_2mb_boundary);
+
+		if (header_magic == 0x5a4d)
+		{
+			return system_2mb_boundary;
+		}
 	}
 
-	return get_eprocess(4, current_process);
+	return 0;
 }

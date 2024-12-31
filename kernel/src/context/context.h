@@ -14,6 +14,7 @@ namespace context
 		communication::s_protected_processes protected_processes;
 		imports::s_imports imports;
 
+		uint64_t ntoskrnl_base_address = 0;
 		uint64_t initial_system_process = 0;
 	};
 

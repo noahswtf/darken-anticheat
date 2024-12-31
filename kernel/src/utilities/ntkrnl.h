@@ -23,7 +23,7 @@ namespace ntkrnl
 
 	namespace pre_initialization
 	{
-		// note: to be used only when in search of ntoskrnl base address when setting up context (to resolve imports)
-		uint64_t find_initial_system_process();
+		// note: to be used only when in when setting up context (to resolve imports before we have any indication of build number to get offsets)
+		uint64_t find_ntoskrnl_base();
 	}
 }
