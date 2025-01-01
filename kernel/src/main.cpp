@@ -6,6 +6,7 @@
 #include "detections/patchguard/patchguard.h"
 #include "utilities/ntkrnl.h"
 #include "imports/imports.h"
+#include "memory/page_tables.h"
 #include "offsets/offsets.h"
 #include "log.h"
 
@@ -118,9 +119,11 @@ void driver_unload(PDRIVER_OBJECT driver_object)
 	t_io_delete_device io_delete_device = context->imports.io_delete_device;
 	t_io_delete_symbolic_link io_delete_symbolic_link = context->imports.io_delete_symbolic_link;
 
+	handles::permission_stripping::unload(context);
+	page_tables::unload(context);
+
 	context = nullptr;
 
-	handles::permission_stripping::unload();
 	context::unload();
 
 	io_delete_device(driver_object->DeviceObject);
@@ -131,8 +134,12 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 {
 	UNREFERENCED_PARAMETER(registry_path);
 
+	driver_object->DriverUnload = driver_unload;
+
 	if (context::load() == false)
 	{
+		d_log("[darken-anticheat] failed to set up initial context.\n");
+
 		return STATUS_ABANDONED;
 	}
 
@@ -140,12 +147,21 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 
 	if (imports::load(context) == false)
 	{
+		d_log("[darken-anticheat] failed to manually load imports.\n");
+
 		return STATUS_ABANDONED;
 	}
 
 	if (offsets::load(context) == false)
 	{
 		d_log("[darken-anticheat] failed to calculate offsets, are we on an unsupported Windows version?\n");
+
+		return STATUS_ABANDONED;
+	}
+
+	if (page_tables::load(context) == false)
+	{
+		d_log("[darken-anticheat] failed to set up page table.\n");
 
 		return STATUS_ABANDONED;
 	}
@@ -160,7 +176,6 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 	driver_object->MajorFunction[IRP_MJ_CREATE] = ioctl_manage_call;
 	driver_object->MajorFunction[IRP_MJ_CLOSE] = ioctl_manage_call;
 	driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL] = ioctl_call_processor;
-	driver_object->DriverUnload = driver_unload;
 
 	NTSTATUS sanity_status = context->imports.io_create_symbolic_link(&driver_info::device_symbolic_name, &driver_info::device_name);
 

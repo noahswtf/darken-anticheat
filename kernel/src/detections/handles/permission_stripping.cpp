@@ -79,12 +79,10 @@ bool handles::permission_stripping::load(context::s_context* context)
 	return NT_SUCCESS(context->imports.ob_register_callbacks(&callback_registration, &callback_handle));
 }
 
-void handles::permission_stripping::unload()
+void handles::permission_stripping::unload(context::s_context* context)
 {
 	if (callback_handle != nullptr)
 	{
-		context::s_context* context = context::get_decrypted();
-
 		context->imports.ob_unregister_callbacks(callback_handle);
 
 		callback_handle = nullptr;

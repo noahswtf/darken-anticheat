@@ -33,6 +33,8 @@ bool context::load()
 		return false;
 	}
 
+	memset(context, 0, sizeof(s_context));
+
 	context->imports.ex_allocate_pool_2 = ex_allocate_pool_2;
 	context->ntoskrnl_base_address = ntoskrnl_base_address;
 	context->initial_system_process = ntkrnl::get_current_process(); // will be the initial system process on driver entry

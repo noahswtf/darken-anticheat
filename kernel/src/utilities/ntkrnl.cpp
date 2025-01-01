@@ -48,6 +48,11 @@ uint64_t ntkrnl::get_process_base_address(uint64_t eprocess)
 	return *reinterpret_cast<uint64_t*>(eprocess + offsets::eprocess::section_base_address);
 }
 
+uint64_t ntkrnl::get_process_directory_table_base(uint64_t eprocess)
+{
+	return *reinterpret_cast<uint64_t*>(eprocess + offsets::eprocess::directory_table_base);
+}
+
 uint64_t ntkrnl::get_thread_eprocess(uint64_t ethread)
 {
 	return *reinterpret_cast<uint64_t*>(ethread + offsets::kthread::process);

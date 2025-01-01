@@ -28,6 +28,8 @@ bool imports::load(context::s_context* context)
 	context->imports.ke_stack_attach_process = reinterpret_cast<t_ke_stack_attach_process>(ntoskrnl_image->find_export(d_encrypt_string("KeStackAttachProcess")));
 	context->imports.ke_unstack_detach_process = reinterpret_cast<t_ke_unstack_detach_process>(ntoskrnl_image->find_export(d_encrypt_string("KeUnstackDetachProcess")));
 	context->imports.mm_is_address_valid = reinterpret_cast<t_mm_is_address_valid>(ntoskrnl_image->find_export(d_encrypt_string("MmIsAddressValid")));
+	context->imports.mm_get_physical_address = reinterpret_cast<t_mm_get_physical_address>(ntoskrnl_image->find_export(d_encrypt_string("MmGetPhysicalAddress")));
+	context->imports.mm_get_virtual_for_physical = reinterpret_cast<t_mm_get_virtual_for_physical>(ntoskrnl_image->find_export(d_encrypt_string("MmGetVirtualForPhysical")));
 
 	return true;
 }

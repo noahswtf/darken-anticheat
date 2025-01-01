@@ -2,6 +2,8 @@
 #include <communication_types.h>
 #include "../imports/imports_def.h"
 
+#define d_pool_tag 'drac'
+
 namespace context
 {
 	bool load();

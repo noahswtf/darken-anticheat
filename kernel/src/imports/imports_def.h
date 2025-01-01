@@ -16,6 +16,8 @@ typedef uint64_t(__stdcall* t_ps_get_process_peb)(uint64_t eprocess);
 typedef void(__stdcall* t_ke_stack_attach_process)(uint64_t eprocess, void* apc_state);
 typedef void(__stdcall* t_ke_unstack_detach_process)(void* apc_state);
 typedef uint8_t(__stdcall* t_mm_is_address_valid)(uint64_t virtual_address);
+typedef uint64_t(__stdcall* t_mm_get_physical_address)(uint64_t virtual_address);
+typedef uint64_t(__stdcall* t_mm_get_virtual_for_physical)(uint64_t physical_address);
 
 namespace imports
 {
@@ -40,5 +42,7 @@ namespace imports
 		t_ke_stack_attach_process ke_stack_attach_process;
 		t_ke_unstack_detach_process ke_unstack_detach_process;
 		t_mm_is_address_valid mm_is_address_valid;
+		t_mm_get_physical_address mm_get_physical_address;
+		t_mm_get_virtual_for_physical mm_get_virtual_for_physical;
 	};
 }

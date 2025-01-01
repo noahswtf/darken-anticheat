@@ -12,8 +12,6 @@ extern "C" NTKERNELAPI PPEB PsGetProcessPeb(PEPROCESS);
 #pragma warning(push)
 #pragma warning(disable: 6387) // explanation to this given in identical line in: /src/system/system_thread.cpp
 
-#define print( format, ... ) DbgPrintEx( DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, format, __VA_ARGS__ )
-
 communication::e_detection_status process::process_thread::is_suspicious_thread_present(context::s_context* context, communication::s_is_suspicious_process_thread_present is_suspicious_process_thread_present)
 {
 	if (is_suspicious_process_thread_present.process_id == 0)

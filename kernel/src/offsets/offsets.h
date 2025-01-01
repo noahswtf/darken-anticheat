@@ -32,6 +32,7 @@ namespace offsets
 
 	namespace eprocess
 	{
+		inline uint64_t directory_table_base = 0x28;
 		inline uint64_t unique_process_id = 0x2E8; // doesn't change until Windows 10 1703, Windows 10 2004, Windows 11 24H2 (last checked: Windows 11 24H2)
 		inline uint64_t active_process_links = 0; // always the same as (unique_process_id + 8) (last checked: Windows 11 24H2)
 		inline uint64_t section_base_address = 0x3C0; // doesn't change until Windows 10 1903

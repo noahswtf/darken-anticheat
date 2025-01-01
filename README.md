@@ -15,6 +15,7 @@ Open source solution for protecting your software against tampering and reverse 
 
 # Credits
 - [papstuc](https://github.com/papstuc) for the [nocrt portable executable library used](https://github.com/papstuc/nocrt_portable_executable).
+- [jonomango](https://github.com/jonomango), [Satoshi Tanda](https://github.com/tandasat), and [Petr Beneš](https://github.com/wbenny) for their contributions to the [ia32-doc](https://github.com/tandasat/ia32-doc) project.
 
 # Licensing
 This project has been placed under the [GNU General Public License](LICENSE), if there are any specific enquiries regarding usage, please contact the founder of the project (noahswtf).

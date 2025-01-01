@@ -6,6 +6,6 @@ namespace handles
 	namespace permission_stripping
 	{
 		bool load(context::s_context* context);
-		void unload();
+		void unload(context::s_context* context);
 	}
 }

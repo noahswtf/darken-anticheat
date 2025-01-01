@@ -165,6 +165,8 @@
     <ClCompile Include="src\detections\hypervisor\reserved_msr_usage.cpp" />
     <ClCompile Include="src\imports\imports.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\memory\memory.cpp" />
+    <ClCompile Include="src\memory\page_tables.cpp" />
     <ClCompile Include="src\offsets\offsets.cpp" />
     <ClCompile Include="src\detections\patchguard\patchguard.cpp" />
     <ClCompile Include="src\detections\process\process_thread.cpp" />
@@ -172,6 +174,7 @@
     <ClCompile Include="src\utilities\ntkrnl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ext\ia32\ia32.h" />
     <ClInclude Include="ext\portable_executable\data_directory.hpp" />
     <ClInclude Include="ext\portable_executable\dos_header.hpp" />
     <ClInclude Include="ext\portable_executable\export_directory.hpp" />
@@ -193,10 +196,13 @@
     <ClInclude Include="src\imports\imports.h" />
     <ClInclude Include="src\imports\imports_def.h" />
     <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\memory\memory.h" />
+    <ClInclude Include="src\memory\page_tables.h" />
     <ClInclude Include="src\offsets\offsets.h" />
     <ClInclude Include="src\detections\patchguard\patchguard.h" />
     <ClInclude Include="src\detections\process\process_thread.h" />
     <ClInclude Include="src\structures\kldr_data_table_entry.h" />
+    <ClInclude Include="src\structures\virtual_address.h" />
     <ClInclude Include="src\structures\ldr_data_table_entry.h" />
     <ClInclude Include="src\structures\ldr_dll_load_reason.h" />
     <ClInclude Include="src\structures\peb_ldr_data.h" />
