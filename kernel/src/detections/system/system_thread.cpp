@@ -98,7 +98,7 @@ communication::e_detection_status system::system_thread::is_suspicious_thread_pr
 		// can be bypassed by changing the value in the ETHREAD struct
 		// or using a (jmp rcx) gadget which is in legitimate module and passing the real start address as context
 
-		uint64_t current_thread_win32_start_address = *reinterpret_cast<uint64_t*>(current_ethread + offsets::ethread::win32_start_address);
+		uint64_t current_thread_win32_start_address = ntkrnl::get_thread_win32_start_address(current_ethread);
 
 		if (current_thread_win32_start_address == 0) // yes, people do set it to 0 for some odd reason
 		{

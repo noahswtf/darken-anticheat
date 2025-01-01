@@ -53,9 +53,29 @@ uint64_t ntkrnl::get_process_directory_table_base(uint64_t eprocess)
 	return *reinterpret_cast<uint64_t*>(eprocess + offsets::eprocess::directory_table_base);
 }
 
+uint64_t ntkrnl::get_process_peb(uint64_t eprocess)
+{
+	return *reinterpret_cast<uint64_t*>(eprocess + offsets::eprocess::peb);
+}
+
 uint64_t ntkrnl::get_thread_eprocess(uint64_t ethread)
 {
 	return *reinterpret_cast<uint64_t*>(ethread + offsets::kthread::process);
+}
+
+uint64_t ntkrnl::get_thread_apc_eprocess(uint64_t ethread)
+{
+	return *reinterpret_cast<uint64_t*>(ethread + offsets::kthread::apc_state + offsets::kapc_state::process);
+}
+
+uint64_t ntkrnl::get_thread_win32_start_address(uint64_t ethread)
+{
+	return *reinterpret_cast<uint64_t*>(ethread + offsets::ethread::win32_start_address);
+}
+
+uint64_t ntkrnl::get_thread_process_id(uint64_t ethread)
+{
+	return *reinterpret_cast<uint64_t*>(ethread + offsets::ethread::cid);
 }
 
 uint64_t ntkrnl::get_current_process()

@@ -11,8 +11,13 @@ namespace ntkrnl
 	uint64_t get_process_id(uint64_t eprocess);
 	uint64_t get_process_base_address(uint64_t eprocess);
 	uint64_t get_process_directory_table_base(uint64_t eprocess);
+	uint64_t get_process_peb(uint64_t eprocess);
 
 	uint64_t get_thread_eprocess(uint64_t ethread);
+	uint64_t get_thread_apc_eprocess(uint64_t ethread);
+	uint64_t get_thread_win32_start_address(uint64_t ethread);
+	uint64_t get_thread_process_id(uint64_t ethread);
+
 	uint64_t get_current_process();
 	uint64_t get_current_thread();
 

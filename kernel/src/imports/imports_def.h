@@ -12,10 +12,8 @@ typedef void(__stdcall* t_io_delete_device)(void* device_object);
 typedef uint32_t(__stdcall* t_io_delete_symbolic_link)(void* symbolic_link_name);
 typedef uint32_t(__stdcall* t_ps_lookup_thread_by_thread_id)(uint64_t thread_id, void* thread_out);
 typedef uint8_t(__stdcall* t_ps_is_system_thread)(uint64_t thread);
-typedef uint64_t(__stdcall* t_ps_get_process_peb)(uint64_t eprocess);
 typedef void(__stdcall* t_ke_stack_attach_process)(uint64_t eprocess, void* apc_state);
 typedef void(__stdcall* t_ke_unstack_detach_process)(void* apc_state);
-typedef uint8_t(__stdcall* t_mm_is_address_valid)(uint64_t virtual_address);
 typedef uint64_t(__stdcall* t_mm_get_physical_address)(uint64_t virtual_address);
 typedef uint64_t(__stdcall* t_mm_get_virtual_for_physical)(uint64_t physical_address);
 
@@ -38,10 +36,8 @@ namespace imports
 		t_io_delete_symbolic_link io_delete_symbolic_link;
 		t_ps_lookup_thread_by_thread_id ps_lookup_thread_by_thread_id;
 		t_ps_is_system_thread ps_is_system_thread;
-		t_ps_get_process_peb ps_get_process_peb;
 		t_ke_stack_attach_process ke_stack_attach_process;
 		t_ke_unstack_detach_process ke_unstack_detach_process;
-		t_mm_is_address_valid mm_is_address_valid;
 		t_mm_get_physical_address mm_get_physical_address;
 		t_mm_get_virtual_for_physical mm_get_virtual_for_physical;
 	};
